@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import type { Role, RoleStatus, PermissionGroup } from '@/types'
 import type { CreateRoleRequest, UpdateRoleRequest } from '@/services/api/permission.api'
+import { PageActions } from '@/components/layouts/PageActions'
 
 // ============================================================
 // 类型定义
@@ -383,12 +384,8 @@ export default function PermissionManagePage() {
   return (
     <TooltipProvider delayDuration={300}>
       <div className="p-6 space-y-6">
-        {/* ====== 页面标题 ====== */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold">权限管理</h1>
-            <p className="text-muted-foreground mt-1">管理系统角色和权限分配</p>
-          </div>
+        {/* 页面级操作：Portal 到顶栏面包屑那一行 */}
+        <PageActions>
           <Button
             onClick={() => { setEditingRole(null); setShowRoleModal(true) }}
             disabled={isEditing}
@@ -396,7 +393,7 @@ export default function PermissionManagePage() {
             <Plus className="w-4 h-4" />
             新增角色
           </Button>
-        </div>
+        </PageActions>
 
         {/* ====== 角色概览卡片 ====== */}
         <RoleCardGrid

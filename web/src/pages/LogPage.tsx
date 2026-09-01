@@ -31,6 +31,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/Tooltip'
+import { PageActions } from '@/components/layouts/PageActions'
 import type { 
   ApplicationLog,
   ThreeAdminLog,
@@ -360,19 +361,8 @@ const LogPage: React.FC<LogPageProps> = ({ mode }) => {
   return (
     <div className="p-6 space-y-6">
       {/* 页面标题 */}
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center gap-2">
-            {config.icon}
-            <h1 className="text-2xl font-bold">{config.title}</h1>
-          </div>
-          {config.description && (
-            <p className="text-sm text-muted-foreground mt-1">
-              {config.description}
-            </p>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
+      {/* 页面级操作：Portal 到顶栏面包屑那一行 */}
+      <PageActions>
           <Button variant="outline" onClick={handleRefresh} disabled={isLoading}>
             <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
             刷新
@@ -381,8 +371,7 @@ const LogPage: React.FC<LogPageProps> = ({ mode }) => {
             <Download className="h-4 w-4" />
             导出XML
           </Button>
-        </div>
-      </div>
+      </PageActions>
 
       {/* 筛选区域 */}
       <Card>

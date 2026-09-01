@@ -73,19 +73,19 @@ func seedDefaultAdmins(db *sql.DB) error {
 			Username:    "admin",
 			Name:        "管理员",
 			Role:        "admin",
-			Permissions: `["dashboard:view","meeting:read","meeting:write","meeting:delete","meeting:manage","sync:read","sync:manage","personnel:read","personnel:write","personnel:delete","personnel:manage","role:read","role:write","role:delete","role:manage","security:read","security:manage","org:read","org:manage","staff:read","staff:manage","user:read","user:write","user:delete","user:manage","system:dict:read","system:dict:manage","system:config:read","system:config:manage","system:logs:read","logs:admin:read","logs:audit:read","monitor:alerts:read","monitor:alerts:manage","device:read","device:manage"]`,
+			Permissions: `["dashboard:view","role:read","role:write","role:delete","role:manage","org:read","org:manage","staff:read","staff:manage","user:read","user:write","user:delete","user:manage","security:user:manage","system:dict:read","system:dict:manage","system:config:read","system:config:manage","system:logs:read","logs:admin:read","logs:audit:read"]`,
 		},
 		{
 			Username:    "secadm",
 			Name:        "安全管理员",
 			Role:        "security_admin",
-			Permissions: `["dashboard:view","security:read","security:manage","user:read","user:write","user:delete","user:manage","personnel:read","personnel:write","personnel:manage","logs:admin:read"]`,
+			Permissions: `["dashboard:view","security:user:manage","user:read","user:write","user:delete","user:manage","role:read","role:manage","logs:admin:read","system:config:read","system:config:manage"]`,
 		},
 		{
 			Username:    "sysadm",
 			Name:        "系统管理员",
 			Role:        "system_admin",
-			Permissions: `["dashboard:view","org:read","org:manage","personnel:read","personnel:manage","device:read","device:manage","system:nameplate:manage"]`,
+			Permissions: `["dashboard:view","org:read","org:manage","staff:read","staff:manage","system:dict:read","system:dict:manage","system:logs:read"]`,
 		},
 		{
 			Username:    "auditadm",
@@ -97,10 +97,12 @@ func seedDefaultAdmins(db *sql.DB) error {
 			Username:    "user",
 			Name:        "普通用户",
 			Role:        "user",
-			Permissions: `["dashboard:view","meeting:read","meeting:write","meeting:delete","meeting:manage","sync:read","sync:manage","device:clear"]`,
+			Permissions: `["dashboard:view"]`,
 		},
 	}
 
+	// 注意：这里的 Permissions 必须与 seed/seed_sqlite.sql 中同名角色的
+	// permissions 保持一致，且只能使用 PERMISSIONS 字典里存在的权限码。
 	for _, admin := range defaultAdmins {
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(defaultAdminPassword), bcrypt.DefaultCost)
 		if err != nil {

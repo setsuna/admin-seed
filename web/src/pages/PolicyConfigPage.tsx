@@ -17,6 +17,7 @@ import { CircularProgress } from '@/components/ui/CircularProgress'
 import { policyService } from '@/services/policy'
 import { useNotifications } from '@/hooks/useNotifications'
 import type { SecurityPolicy, AuditLogStatsResponse } from '@/types'
+import { PageActions } from '@/components/layouts/PageActions'
 
 const PolicyConfigPage = () => {
   const { showConfirm } = useGlobalDialog()
@@ -316,14 +317,8 @@ const PolicyConfigPage = () => {
   
   return (
     <div className="space-y-6">
-      {/* 页面标题和操作栏 */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">策略配置</h1>
-          <p className="text-sm text-gray-500 mt-1">配置系统安全策略和管理规则</p>
-        </div>
-        
-        <div className="flex space-x-2">
+      {/* 页面级操作：Portal 到顶栏面包屑那一行 */}
+      <PageActions>
           <Button
             variant="outline"
             onClick={handleLoadDefault}
@@ -358,8 +353,7 @@ const PolicyConfigPage = () => {
             <Save className="w-4 h-4" />
             保存配置
           </Button>
-        </div>
-      </div>
+      </PageActions>
       
       {/* 未保存更改提示 */}
       {hasUnsavedChanges && (

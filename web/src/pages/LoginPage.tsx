@@ -4,7 +4,7 @@ import { Eye, EyeOff, AlertTriangle, CloudOff, ShieldCheck, History, PanelLeft, 
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardContent } from '@/components/ui/Card'
-import { Logo } from '@/components/ui/Logo'
+import { Logo, Mark } from '@/components/ui/Logo'
 import { useAuth } from '@/store'
 import { auth } from '@/services/core/auth.service'
 import { isDevelopment, ERROR_CODES } from '@/config'
@@ -14,8 +14,6 @@ import { ForceChangePasswordDialog } from '@/components/business/auth/ForceChang
 import { policyService } from '@/services/policy'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/Dialog'
 import { ThemeSwitcher } from '@/components/ThemeSwitcher'
-import logoHorizontalWhite from '@/assets/logo/logo-horizontal-white.png'
-import logoHorizontal from '@/assets/logo/logo-horizontal.png'
 import { useUI } from '@/store'
 import { APP_MAJOR_VERSION, APP_VERSION_FULL, COMPANY_NAME } from '@/utils/version'
 import type { AlertItem } from '@/types'
@@ -120,7 +118,6 @@ const LoginPage = () => {
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-color-scheme: dark)').matches)
   const brandAreaIsLight = brand === 'ink-black' && isDarkMode
-  const brandAreaLogo = brandAreaIsLight ? logoHorizontal : logoHorizontalWhite
   
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -564,14 +561,11 @@ const LoginPage = () => {
         </svg>
         
         {/* 顶部：公司 logo（白版）+ 产品名称 */}
-        {/* 背景为 bg-primary 深色，必须用 white 变体（PNG 无法 fill-current 换色） */}
+        {/* 品牌区背景为 bg-primary 深色；Mark 用 currentColor，随下方类名换色 */}
         <div className="relative z-10 animate-fade-up motion-reduce:animate-none">
-          <img
-            src={brandAreaLogo}
-            alt=""
-            aria-hidden="true"
-            draggable={false}
-            className="h-20 w-auto select-none object-contain opacity-95"
+          <Mark
+            size={72}
+            className={brandAreaIsLight ? 'text-primary opacity-95' : 'text-white opacity-95'}
           />
           <h1 className="mt-6 flex items-baseline gap-2.5 text-3xl xl:text-4xl font-bold tracking-wide leading-snug">
             <span>{APP_NAME}</span>

@@ -50,11 +50,6 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">仪表板</h1>
-        <p className="mt-1 text-sm text-muted-foreground">系统概览</p>
-      </div>
-
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="用户总数"

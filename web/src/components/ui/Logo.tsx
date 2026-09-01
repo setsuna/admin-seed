@@ -1,19 +1,16 @@
 import React from 'react'
 
-import logoHorizontal from '@/assets/logo/logo-horizontal.png'
-import logoHorizontalWhite from '@/assets/logo/logo-horizontal-white.png'
-import logoVertical from '@/assets/logo/logo-vertical.png'
-
 /**
- * Logo 变体：
- * - color    横版彩色（浅色背景，如白卡片、页面背景）
- * - white    横版白色（深色 / 品牌色背景，如 split 布局左侧品牌区、深色侧边栏）
- * - vertical 竖版彩色（方形，适合正方形容器 / 大尺寸展示）
+ * 品牌标记（中性占位）
  *
- * 注意：资源为 PNG（来自平板端 SealMeet），无法通过 fill-current 换色，
- * 因此深色背景必须显式指定 variant="white"。
+ * 种子项目不带任何公司标识，这里用一个内联 SVG：圆角方块 + 三条递减横线。
+ * 换成自己的品牌时，只需替换下方 <Mark> 的 SVG 内容，尺寸与调用方无需改动。
+ *
+ * 用 currentColor 上色，因此深浅背景都能自适应：
+ * - variant="color" 取主题色（浅色背景）
+ * - variant="white" 取白色（深色 / 品牌色背景）
  */
-export type LogoVariant = 'color' | 'white' | 'vertical'
+export type LogoVariant = 'color' | 'white'
 
 interface LogoProps {
   className?: string
@@ -25,29 +22,38 @@ interface LogoProps {
   text?: string
 }
 
-const LOGO_SRC: Record<LogoVariant, string> = {
-  color: logoHorizontal,
-  white: logoHorizontalWhite,
-  vertical: logoVertical,
+const SIZE_PX: Record<NonNullable<LogoProps['size']>, number> = {
+  sm: 24,
+  md: 32,
+  lg: 48,
 }
 
-/** 横版 logo 原始宽高比约 1200:500，竖版约 1:1 */
-const ASPECT_RATIO: Record<LogoVariant, number> = {
-  color: 1200 / 500,
-  white: 1200 / 500,
-  vertical: 1,
+const TEXT_CLASS: Record<NonNullable<LogoProps['size']>, string> = {
+  sm: 'text-sm',
+  md: 'text-base',
+  lg: 'text-2xl',
 }
 
-/**
- * 尺寸指的是 logo 图片高度。
- * 横版 logo 宽高比约 2.4:1，同样高度下视觉体量比方形图标小，
- * 故此处取值比一般图标偏大。
- */
-const SIZE_CONFIG = {
-  sm: { height: 36, fontSize: 15 },
-  md: { height: 48, fontSize: 19 },
-  lg: { height: 68, fontSize: 24 },
-} as const
+/** 纯图形部分，可单独使用（如侧边栏收起时只剩 32px 宽） */
+export const Mark: React.FC<{ size?: number; className?: string }> = ({
+  size = 32,
+  className,
+}) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 32 32"
+    fill="none"
+    role="img"
+    aria-label="Logo"
+    className={className}
+  >
+    <rect width="32" height="32" rx="8" fill="currentColor" />
+    <rect x="9" y="10" width="14" height="2.6" rx="1.3" fill="#fff" />
+    <rect x="9" y="15" width="10" height="2.6" rx="1.3" fill="#fff" opacity=".8" />
+    <rect x="9" y="20" width="6" height="2.6" rx="1.3" fill="#fff" opacity=".6" />
+  </svg>
+)
 
 export const Logo: React.FC<LogoProps> = ({
   className = '',
@@ -56,47 +62,17 @@ export const Logo: React.FC<LogoProps> = ({
   variant = 'color',
   text,
 }) => {
-  const appTitle = text ?? import.meta.env.VITE_APP_TITLE ?? '管理系统'
-  const config = SIZE_CONFIG[size]
-  const src = LOGO_SRC[variant]
-  const width = Math.round(config.height * ASPECT_RATIO[variant])
-
-  const image = (
-    <img
-      src={src}
-      alt={appTitle}
-      width={width}
-      height={config.height}
-      draggable={false}
-      style={{ height: config.height, width: 'auto' }}
-      className="select-none object-contain"
-    />
-  )
-
-  if (!showText) {
-    return <span className={`inline-flex items-center ${className}`}>{image}</span>
-  }
-
-  // 白版 logo 用于深色底，文字跟随 currentColor；彩色版用于浅色底，文字用主文本色
-  const textColorClass = variant === 'white' ? 'text-current' : 'text-text-primary'
-  // 分隔线高度跟随 logo 高度，避免小尺寸下显得过长
-  const dividerHeight = Math.round(config.height * 0.55)
+  const appName = text ?? import.meta.env.VITE_APP_TITLE ?? '管理后台'
+  const markColor = variant === 'white' ? 'text-white' : 'text-primary'
 
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
-      {image}
-      {/* 分隔竖线，弱化但保持两个标识的独立性 */}
-      <span
-        aria-hidden="true"
-        style={{ height: dividerHeight }}
-        className={variant === 'white' ? 'w-px bg-current opacity-30' : 'w-px bg-border'}
-      />
-      <span
-        className={`font-semibold tracking-wide whitespace-nowrap ${textColorClass}`}
-        style={{ fontSize: config.fontSize }}
-      >
-        {appTitle}
-      </span>
+    <div className={`flex items-center gap-2.5 ${className}`}>
+      <Mark size={SIZE_PX[size]} className={`${markColor} shrink-0`} />
+      {showText && (
+        <span className={`font-semibold tracking-wide ${TEXT_CLASS[size]}`}>{appName}</span>
+      )}
     </div>
   )
 }
+
+export default Logo

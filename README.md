@@ -134,6 +134,52 @@ Go 服务会把 `./static` 作为 SPA 根目录并处理前端路由 fallback。
 2. **不要用纯白当页面底。** shadcn 的 `--background` 必须保持纯白（大量组件默认透出它），
    页面外层一律用 `bg-bg-page`。纯白底 + 白卡片时，卡片边界、分页条、表头全部失去容器感。
 
+### 页面头部与操作按钮
+
+**各页不写大标题。** 页面标题只出现在顶栏面包屑里（其最后一段就是 `<h1>`）。
+原来每页都有一个「大标题 + 副标题」块，内容与面包屑重复，却要吃掉约 80px
+垂直空间（900px 视口的 10%、1366×768 笔记本的 12%）。
+
+页面级操作按钮用 `<PageActions>` Portal 到顶栏面包屑那一行：
+
+```tsx
+import { PageActions } from '@/components/layouts/PageActions'
+
+<PageActions>
+  <Button onClick={...}>新增角色</Button>
+</PageActions>
+```
+
+放在页面组件任意位置即可，不影响布局；路由切换时自动卸载。
+同一时刻只应有一个页面渲染它。
+
+### 权限体系
+
+权限码是**唯一事实来源在数据库字典**里，共 21 条，分 5 组：
+
+| 分组 category | 权限 | 覆盖页面 |
+|---|---|---|
+| `workspace` | dashboard:view | 仪表板 |
+| `personnel` | role:read/write/delete/manage | 角色权限 |
+| `organization` | org:*、staff:*、user:* | 部门管理、用户管理 |
+| `security` | security:user:manage | 重置密码 / 启停用账号 |
+| `system` | system:dict:*、system:config:*、system:logs:read、logs:admin:read、logs:audit:read | 数据字典、安全策略、操作日志 |
+
+新增业务权限要**同时改三处**，漏一处就会出现"矩阵里有项但点不动"或"孤儿权限"：
+
+1. `seed/seed_sqlite.sql` 的 `PERMISSIONS` 字典追加一条，`category` 决定它落在哪个分组
+2. `service/permission.go` 的 `categoryOrder` + `getCategoryName`（只在新增 category 时）
+3. 路由上加 `middleware.RequirePermission("your:perm")`
+
+角色的 permissions 数组在两处，必须保持一致：`seed_sqlite.sql` 的 roles 表 与
+`seed/seed.go` 里各内置账号的 `Permissions` 字段。
+
+### 品牌占位
+
+logo 是内联 SVG（`components/ui/Logo.tsx` 的 `<Mark>`），用 `currentColor` 上色，
+深浅背景都能自适应。换成自己的品牌时只需替换该 SVG 的内容，
+调用方（侧边栏、登录页）无需改动。favicon 在 `public/favicon.svg`。
+
 卡片默认**只有边框、没有常驻阴影**——浅色系里阴影几乎不可见，反而让边缘发糊。
 需要"浮起"效果时用 `<Card variant="lift">`，hover 才加阴影。
 
@@ -157,8 +203,6 @@ Go 服务会把 `./static` 作为 SPA 根目录并处理前端路由 fallback。
 ## 已知待办
 
 - `users.security_level` 密级体系未拆除（见上）
-- 字典种子里还留着 `MEETING_STATUS` / `ROOM_TYPE` / `DEVICE_TYPE` 三条会议遗留字典，
-  新项目可直接在「数据字典」页面删掉
 - Repository 层多处使用 `SELECT *` + 按列序 `Scan`，加字段时必须同步改 Scan
   顺序，否则报 "expected N destination arguments"。建议后续改成显式列名。
 - MySQL schema 已按 SQLite 版翻译并做了语法检查，但**尚未在真实 MySQL 实例上跑过**，

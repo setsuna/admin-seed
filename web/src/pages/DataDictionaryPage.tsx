@@ -387,14 +387,6 @@ const DataDictionaryPage: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      {/* 标题区域 */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">数据字典管理</h1>
-          <p className="text-muted-foreground">管理系统数据字典配置</p>
-        </div>
-      </div>
-
       {/* 搜索和筛选工具栏 */}
       <div className="flex items-center justify-between p-4 bg-background rounded-lg border">
         <div className="flex items-center gap-4">

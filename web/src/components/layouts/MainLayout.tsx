@@ -90,11 +90,18 @@ export const MainLayout = memo(function MainLayout() {
                   <span>/</span>
                 </>
               )}
-              <span className="text-foreground">{breadcrumb.page}</span>
+              {/* 页面标题的语义 landmark。视觉上就是面包屑最后一段，
+                  各页不再重复渲染大标题（详见 PageActions 组件注释）。 */}
+              <h1 className="text-sm font-normal text-foreground">{breadcrumb.page}</h1>
             </nav>
-            
+
             {/* 右侧操作区 */}
             <div className="flex items-center gap-2">
+              {/* 页面级操作按钮的挂载点，由 <PageActions> 通过 Portal 填充 */}
+              <div id="page-actions" className="flex items-center gap-2" />
+              {(
+                <span className="mx-1 hidden h-5 w-px bg-border sm:block" aria-hidden />
+              )}
               {/* 音效开关 - 使用独立组件，避免父组件重渲染 */}
               <SoundToggle />
               

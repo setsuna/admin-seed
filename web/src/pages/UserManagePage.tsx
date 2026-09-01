@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Upload, Edit, Trash2, Search, RefreshCw, Shield, Users, UserCheck, UserX, AlertTriangle, Key, ShieldCheck, ShieldAlert, ShieldX, Building } from 'lucide-react'
+import { Plus, Upload, Edit, Trash2, Search, RefreshCw, Shield, Users, UserCheck, UserX, AlertTriangle, Key, ShieldCheck, ShieldAlert, Building } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
@@ -26,7 +26,7 @@ import { BatchImportDialog } from '@/components/business/user/BatchImportDialog'
 import { useUser } from '@/hooks/useUser'
 import { useRoleOptions } from '@/hooks/useRole'
 import type { User, CreateUserRequest, UpdateUserRequest, UserSecurityLevel } from '@/types'
-import { getSecuritySoftClass, getSecurityLevelLabel } from '@/utils'
+import { getSecurityLevelLabel } from '@/utils'
 
 interface UserManagePageProps {
   mode: 'admin' | 'security' | 'security_level'
@@ -459,25 +459,8 @@ const UserManagePage: React.FC<UserManagePageProps> = ({ mode }) => {
           )
         }
       },
-      {
-        key: 'securityLevel',
-        title: mode === 'security_level' ? '当前密级' : '密级',
-        render: (securityLevel: UserSecurityLevel) => {
-          const iconMap: Record<string, any> = {
-            unknown: ShieldX,
-            internal: Shield,
-            confidential: ShieldAlert,
-            secret: ShieldCheck,
-          }
-          const IconComponent = iconMap[securityLevel] || ShieldX
-          return (
-            <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getSecuritySoftClass(securityLevel)}`}>
-              <IconComponent className="w-3 h-3 mr-1" />
-              {getSecurityLevelLabel(securityLevel)}
-            </span>
-          )
-        }
-      },
+      // 「密级」列已移除：种子项目不使用涉密场景的密级体系。
+      // 数据库 users.security_level 字段仍保留，需要时把本列加回即可。
       {
         key: 'status',
         title: '状态',
@@ -868,23 +851,6 @@ const UserManagePage: React.FC<UserManagePageProps> = ({ mode }) => {
                 <SelectContent>
                   {statusOptions.map(status => (
                     <SelectItem key={status.value} value={status.value}>{status.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              <Select
-                value={filters.securityLevel || undefined}
-                onValueChange={(value) => {
-                  setFilters({ ...filters, securityLevel: (value || '') as any })
-                  setPagination({ page: 1, pageSize: pagination?.pageSize || 20 })
-                }}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="全部密级" />
-                </SelectTrigger>
-                <SelectContent>
-                  {securityLevelOptions.map(level => (
-                    <SelectItem key={level.value} value={level.value}>{level.label}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>

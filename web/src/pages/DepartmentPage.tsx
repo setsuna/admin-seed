@@ -13,6 +13,7 @@ import { DepartmentTree } from '@/components/business/department/DepartmentTree'
 import { DepartmentStats } from '@/components/business/department/DepartmentStats'
 import { useDepartment } from '@/hooks/useDepartment'
 import type { Department, CreateDepartmentRequest, UpdateDepartmentRequest } from '@/types'
+import { PageActions } from '@/components/layouts/PageActions'
 
 interface DepartmentFormData {
   name: string
@@ -309,16 +310,8 @@ const DepartmentPage = () => {
   
   return (
     <div className="p-6 space-y-6">
-      {/* 页面标题 */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">部门管理</h1>
-          <p className="text-muted-foreground mt-1">
-            管理组织架构中的部门信息，支持树形结构和层级管理
-          </p>
-        </div>
-        
-        <div className="flex items-center space-x-2">
+      {/* 页面级操作：Portal 到顶栏面包屑那一行 */}
+      <PageActions>
           <Button
             variant={viewMode === 'table' ? 'default' : 'outline'}
             size="sm"
@@ -333,8 +326,7 @@ const DepartmentPage = () => {
           >
             树形视图
           </Button>
-        </div>
-      </div>
+      </PageActions>
       
       {/* 统计信息 */}
       <DepartmentStats />

@@ -19,7 +19,7 @@ import {
   Archive,
 } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
-import logoVertical from '@/assets/logo/logo-vertical.png'
+import { Mark } from '@/components/ui/Logo'
 import { APP_MAJOR_VERSION, APP_VERSION_FULL } from '@/utils/version'
 import {
   Sidebar,
@@ -91,13 +91,8 @@ function AppLogo() {
     <SidebarMenu>
       <SidebarMenuItem>
         <div className="flex items-center gap-2 px-2 py-2">
-          {/* 竖版 logo（方形）：侧边栏收起时仅剩 32px 宽，横版会被压扁 */}
-          <img
-            src={logoVertical}
-            alt="Logo"
-            draggable={false}
-            className="size-8 shrink-0 select-none object-contain"
-          />
+          {/* 方形标记：侧边栏收起时仅剩 32px 宽，只显示图形不显示文字 */}
+          <Mark size={32} className="shrink-0 text-primary" />
           {state === 'expanded' && (
             <div className="grid flex-1 text-left text-sm leading-tight">
               <div className="flex items-center gap-1.5">

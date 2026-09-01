@@ -106,16 +106,6 @@ export const USER_ROLES = {
   GUEST: 'guest',
 } as const
 
-// 会议状态配置
-export const MEETING_STATUS = {
-  DRAFT: 'draft',
-  SCHEDULED: 'scheduled',
-  IN_PROGRESS: 'in_progress',
-  COMPLETED: 'completed',
-  CANCELLED: 'cancelled',
-  POSTPONED: 'postponed',
-} as const
-
 // 文件类型配置
 export const FILE_TYPES = {
   DOCUMENT: 'document',

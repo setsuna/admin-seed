@@ -12,113 +12,43 @@
 -- ============================================================================
 -- 角色
 -- ============================================================================
-INSERT OR IGNORE INTO roles (id, name, code, description, permissions, status, type, level, is_built_in, metadata) VALUES
+-- 角色。permissions 必须是 PERMISSIONS 字典里存在的码，否则权限矩阵会出现孤儿项。
+-- data_scope：1-全部 2-自定义 3-本部门 4-本部门及以下 5-仅本人
+INSERT OR IGNORE INTO roles (id, name, code, description, permissions, status, type, level, is_built_in, data_scope, metadata) VALUES
 ('1', '管理员', 'admin', '拥有所有权限',
- '["dashboard:view","meeting:read","meeting:write","meeting:delete","meeting:manage","sync:read","sync:manage","personnel:read","personnel:write","personnel:delete","personnel:manage","role:read","role:write","role:delete","role:manage","security:read","security:manage","security:user:manage","org:read","org:manage","staff:read","staff:manage","user:read","user:write","user:delete","user:manage","system:dict:read","system:dict:manage","system:config:read","system:config:manage","system:logs:read","logs:admin:read","logs:audit:read","device:read","device:manage","device:clear","system:nameplate:manage"]',
- 'active', 'system', 1, 1,
+ '["dashboard:view","role:read","role:write","role:delete","role:manage","org:read","org:manage","staff:read","staff:manage","user:read","user:write","user:delete","user:manage","security:user:manage","system:dict:read","system:dict:manage","system:config:read","system:config:manage","system:logs:read","logs:admin:read","logs:audit:read"]',
+ 'active', 'system', 1, 1, 1,
  '{"color":"#DC2626","icon":"shield","category":"管理员"}');
 
-INSERT OR IGNORE INTO roles (id, name, code, description, permissions, status, type, level, is_built_in, metadata) VALUES
-('2', '安全管理员', 'security_admin', '负责安全管理和用户权限管理',
- '["dashboard:view","security:read","security:manage","security:user:manage","user:read","user:write","user:delete","user:manage","personnel:read","personnel:write","personnel:manage","logs:admin:read","system:config:read","system:config:manage"]',
- 'active', 'system', 2, 1,
+INSERT OR IGNORE INTO roles (id, name, code, description, permissions, status, type, level, is_built_in, data_scope, metadata) VALUES
+('2', '安全管理员', 'security_admin', '负责账号安全与权限管理',
+ '["dashboard:view","security:user:manage","user:read","user:write","user:delete","user:manage","role:read","role:manage","logs:admin:read","system:config:read","system:config:manage"]',
+ 'active', 'system', 2, 1, 1,
  '{"color":"#EF4444","icon":"shield-check","category":"管理员"}');
 
-INSERT OR IGNORE INTO roles (id, name, code, description, permissions, status, type, level, is_built_in, metadata) VALUES
+INSERT OR IGNORE INTO roles (id, name, code, description, permissions, status, type, level, is_built_in, data_scope, metadata) VALUES
 ('3', '系统管理员', 'system_admin', '负责系统配置和组织架构管理',
- '["dashboard:view","org:read","org:manage","personnel:read","personnel:manage","staff:read","staff:manage","device:read","device:manage","device:clear","system:nameplate:manage"]',
- 'active', 'system', 2, 1,
+ '["dashboard:view","org:read","org:manage","staff:read","staff:manage","system:dict:read","system:dict:manage","system:logs:read"]',
+ 'active', 'system', 2, 1, 4,
  '{"color":"#F59E0B","icon":"settings","category":"管理员"}');
 
-INSERT OR IGNORE INTO roles (id, name, code, description, permissions, status, type, level, is_built_in, metadata) VALUES
-('4', '审计员', 'audit_admin', '负责审计日志查看和监控告警',
+INSERT OR IGNORE INTO roles (id, name, code, description, permissions, status, type, level, is_built_in, data_scope, metadata) VALUES
+('4', '审计员', 'audit_admin', '负责审计日志查看',
  '["dashboard:view","logs:audit:read"]',
- 'active', 'system', 2, 1,
+ 'active', 'system', 2, 1, 1,
  '{"color":"#8B5CF6","icon":"file-search","category":"管理员"}');
 
-INSERT OR IGNORE INTO roles (id, name, code, description, permissions, status, type, level, is_built_in, metadata) VALUES
-('5', '普通用户', 'user', '基础会议查看和打包权限',
- '["dashboard:view","meeting:read","meeting:write","meeting:delete","meeting:manage","sync:read","sync:manage","device:clear"]',
- 'active', 'system', 3, 1,
- '{"color":"#10B981","icon":"user","category":"普通用户"}');
-
--- ============================================================================
--- 字典：安全级别（合并原两处重复定义，统一为一份）
--- ============================================================================
-INSERT OR IGNORE INTO data_dicts (id, dict_code, dict_name, dict_type, status, item_count, remark)
-VALUES ('0ef95cc4-1b81-465e-b636-99eea3d0b5df', 'SECURITY_LEVELS', '安全级别', 'security', 'enabled', 4, NULL);
-
-INSERT OR IGNORE INTO dict_items (id, dict_code, code, name, value, status, sort) VALUES
-('109', 'SECURITY_LEVELS', 'secret', '机密', 'secret', 'enabled', 3),
-('110', 'SECURITY_LEVELS', 'confidential', '秘密', 'confidential', 'enabled', 2),
-('111', 'SECURITY_LEVELS', 'internal', '内部', 'internal', 'enabled', 1);
+INSERT OR IGNORE INTO roles (id, name, code, description, permissions, status, type, level, is_built_in, data_scope, metadata) VALUES
+('5', '普通用户', 'user', '仅可查看仪表板',
+ '["dashboard:view"]',
+ 'active', 'business', 3, 1, 5,
+ '{"color":"#10B981","icon":"user","category":"业务角色"}');
 
 -- ============================================================================
 -- 字典：文件类型
 -- ============================================================================
 INSERT OR IGNORE INTO data_dicts (id, dict_code, dict_name, dict_type, status, item_count, remark)
 VALUES ('a0499fe5-6adc-40b8-8edf-a87118206d4c', 'FILE_TYPES', '文件类型', 'file', 'enabled', 9, NULL);
-
--- ============================================================================
--- 字典：设备类型
--- ============================================================================
-INSERT OR IGNORE INTO data_dicts (id, dict_code, dict_name, dict_type, status, item_count, remark)
-VALUES ('1', 'DEVICE_TYPE', '设备类型', 'device', 'enabled', 5, '会议平板设备类型分类');
-
-INSERT OR IGNORE INTO dict_items (id, dict_code, code, name, value, status, sort) VALUES
-('1', 'DEVICE_TYPE', 'TABLET', '平板设备', '1', 'enabled', 1),
-('2', 'DEVICE_TYPE', 'PHONE', '手机设备', '2', 'enabled', 2),
-('3', 'DEVICE_TYPE', 'PC', '电脑设备', '3', 'enabled', 3),
-('4', 'DEVICE_TYPE', 'TV', '电视设备', '4', 'enabled', 4),
-('5', 'DEVICE_TYPE', 'PROJECTOR', '投影设备', '5', 'disabled', 5);
-
--- ============================================================================
--- 字典：会议状态
--- ============================================================================
-INSERT OR IGNORE INTO data_dicts (id, dict_code, dict_name, dict_type, status, item_count, remark)
-VALUES ('2', 'MEETING_STATUS', '会议状态', 'meeting', 'enabled', 4, '会议流程状态定义');
-
-INSERT OR IGNORE INTO dict_items (id, dict_code, code, name, value, status, sort) VALUES
-('6', 'MEETING_STATUS', 'PREPARATION', '准备中', 'preparation', 'enabled', 1),
-('7', 'MEETING_STATUS', 'DISTRIBUTABLE', '可下发', 'distributable', 'enabled', 2),
-('8', 'MEETING_STATUS', 'IN_PROGRESS', '进行中', 'in_progress', 'enabled', 3),
-('9', 'MEETING_STATUS', 'CLOSED', '已关闭', 'closed', 'enabled', 4);
-
--- ============================================================================
--- 字典：会议室类型
--- ============================================================================
-INSERT OR IGNORE INTO data_dicts (id, dict_code, dict_name, dict_type, status, item_count, remark)
-VALUES ('3', 'ROOM_TYPE', '会议室类型', 'room', 'disabled', 8, '会议室场地类型分类');
-
-INSERT OR IGNORE INTO dict_items (id, dict_code, code, name, value, status, sort) VALUES
-('10', 'ROOM_TYPE', 'CONFERENCE_ROOM', '会议室', '1', 'enabled', 1),
-('11', 'ROOM_TYPE', 'BOARD_ROOM', '董事会议室', '2', 'enabled', 2),
-('12', 'ROOM_TYPE', 'TRAINING_ROOM', '培训室', '3', 'disabled', 3),
-('13', 'ROOM_TYPE', 'AUDITORIUM', '礼堂', '4', 'enabled', 4),
-('14', 'ROOM_TYPE', 'VIDEO_ROOM', '视频会议室', '5', 'enabled', 5),
-('15', 'ROOM_TYPE', 'BREAK_ROOM', '茶歇室', '6', 'enabled', 6),
-('16', 'ROOM_TYPE', 'PHONE_BOOTH', '电话亭', '7', 'enabled', 7),
-('17', 'ROOM_TYPE', 'OUTDOOR_SPACE', '户外场地', '8', 'enabled', 8);
-
--- ============================================================================
--- 字典：文件格式
--- ============================================================================
-INSERT OR IGNORE INTO data_dicts (id, dict_code, dict_name, dict_type, status, item_count, remark)
-VALUES ('4', 'FILE_FORMAT', '文件格式', 'file', 'enabled', 12, '支持的文件格式类型');
-
-INSERT OR IGNORE INTO dict_items (id, dict_code, code, name, value, status, sort) VALUES
-('18', 'FILE_FORMAT', 'PDF', 'PDF文档', 'pdf', 'enabled', 1),
-('19', 'FILE_FORMAT', 'DOCX', 'Word文档', 'docx', 'enabled', 2),
-('20', 'FILE_FORMAT', 'PPTX', 'PowerPoint演示文稿', 'pptx', 'enabled', 3),
-('21', 'FILE_FORMAT', 'XLSX', 'Excel表格', 'xlsx', 'enabled', 4),
-('22', 'FILE_FORMAT', 'TXT', '文本文件', 'txt', 'enabled', 5),
-('23', 'FILE_FORMAT', 'JPG', 'JPEG图片', 'jpg', 'enabled', 6),
-('24', 'FILE_FORMAT', 'PNG', 'PNG图片', 'png', 'enabled', 7),
-('25', 'FILE_FORMAT', 'MP4', 'MP4视频', 'mp4', 'enabled', 8),
-('26', 'FILE_FORMAT', 'AVI', 'AVI视频', 'avi', 'disabled', 9),
-('27', 'FILE_FORMAT', 'MP3', 'MP3音频', 'mp3', 'enabled', 10),
-('28', 'FILE_FORMAT', 'WAV', 'WAV音频', 'wav', 'enabled', 11),
-('29', 'FILE_FORMAT', 'ZIP', 'ZIP压缩包', 'zip', 'enabled', 12);
 
 -- ============================================================================
 -- 字典：菜单分组
@@ -178,45 +108,34 @@ INSERT OR IGNORE INTO dict_items (id, dict_code, code, name, value, status, sort
 -- 字典：系统权限
 -- ============================================================================
 INSERT OR IGNORE INTO data_dicts (id, dict_code, dict_name, dict_type, status, item_count, remark)
-VALUES ('9', 'PERMISSIONS', '系统权限', 'permission', 'enabled', 36, '系统所有权限定义');
+VALUES ('9', 'PERMISSIONS', '系统权限', 'permission', 'enabled', 21, '系统所有权限定义');
 
+-- 权限清单只保留种子真实具备的能力。删除的会议线权限见 README「剥离时丢掉了什么」。
+-- 新增业务权限时：在此追加一条，category 决定它出现在权限矩阵的哪个分组
+-- （分组名映射见 internal/service/permission.go 的 getCategoryName）。
 INSERT OR IGNORE INTO dict_items (id, dict_code, code, name, value, status, sort) VALUES
 ('74', 'PERMISSIONS', 'dashboard:view', '仪表板查看', '{"category":"workspace","resource":"dashboard","action":"read","description":"查看仪表板"}', 'enabled', 1),
-('75', 'PERMISSIONS', 'meeting:read', '会议查看', '{"category":"meeting","resource":"meeting","action":"read","description":"查看会议信息"}', 'enabled', 2),
-('76', 'PERMISSIONS', 'meeting:write', '会议创建', '{"category":"meeting","resource":"meeting","action":"write","description":"创建会议"}', 'enabled', 3),
-('77', 'PERMISSIONS', 'meeting:delete', '会议删除', '{"category":"meeting","resource":"meeting","action":"delete","description":"删除会议"}', 'enabled', 4),
-('78', 'PERMISSIONS', 'meeting:manage', '会议管理', '{"category":"meeting","resource":"meeting","action":"manage","description":"全面管理会议"}', 'enabled', 5),
-('79', 'PERMISSIONS', 'sync:read', '同步状态查看', '{"category":"sync","resource":"sync","action":"read","description":"查看同步状态"}', 'enabled', 6),
-('80', 'PERMISSIONS', 'sync:manage', '同步管理', '{"category":"sync","resource":"sync","action":"manage","description":"管理同步设置"}', 'enabled', 7),
-('81', 'PERMISSIONS', 'personnel:read', '人员查看', '{"category":"personnel","resource":"personnel","action":"read","description":"查看参会人员"}', 'enabled', 8),
-('82', 'PERMISSIONS', 'personnel:write', '人员编辑', '{"category":"personnel","resource":"personnel","action":"write","description":"编辑人员信息"}', 'enabled', 9),
-('83', 'PERMISSIONS', 'personnel:delete', '人员删除', '{"category":"personnel","resource":"personnel","action":"delete","description":"删除人员"}', 'enabled', 10),
-('84', 'PERMISSIONS', 'personnel:manage', '人员管理', '{"category":"personnel","resource":"personnel","action":"manage","description":"管理参会人员"}', 'enabled', 11),
-('85', 'PERMISSIONS', 'role:read', '角色查看', '{"category":"personnel","resource":"role","action":"read","description":"查看角色信息"}', 'enabled', 12),
-('86', 'PERMISSIONS', 'role:write', '角色编辑', '{"category":"personnel","resource":"role","action":"write","description":"编辑角色权限"}', 'enabled', 13),
-('87', 'PERMISSIONS', 'role:delete', '角色删除', '{"category":"personnel","resource":"role","action":"delete","description":"删除角色"}', 'enabled', 14),
-('88', 'PERMISSIONS', 'role:manage', '角色管理', '{"category":"personnel","resource":"role","action":"manage","description":"管理角色权限"}', 'enabled', 15),
-('89', 'PERMISSIONS', 'security:read', '密级查看', '{"category":"personnel","resource":"security","action":"read","description":"查看人员密级"}', 'enabled', 16),
-('90', 'PERMISSIONS', 'security:manage', '密级管理', '{"category":"personnel","resource":"security","action":"manage","description":"管理人员密级"}', 'enabled', 17),
-('91', 'PERMISSIONS', 'security:user:manage', '用户安全管理', '{"category":"security","resource":"user_security","action":"manage","description":"管理用户密码和状态"}', 'enabled', 35),
-('92', 'PERMISSIONS', 'org:read', '组织查看', '{"category":"organization","resource":"organization","action":"read","description":"查看组织架构"}', 'enabled', 18),
-('93', 'PERMISSIONS', 'org:manage', '组织管理', '{"category":"organization","resource":"organization","action":"manage","description":"管理组织架构"}', 'enabled', 19),
-('94', 'PERMISSIONS', 'staff:read', '员工查看', '{"category":"organization","resource":"staff","action":"read","description":"查看员工信息"}', 'enabled', 20),
-('95', 'PERMISSIONS', 'staff:manage', '员工管理', '{"category":"organization","resource":"staff","action":"manage","description":"管理员工信息"}', 'enabled', 21),
-('96', 'PERMISSIONS', 'user:read', '用户查看', '{"category":"organization","resource":"user","action":"read","description":"查看用户信息"}', 'enabled', 31),
-('97', 'PERMISSIONS', 'user:write', '用户创建', '{"category":"organization","resource":"user","action":"write","description":"创建用户"}', 'enabled', 32),
-('98', 'PERMISSIONS', 'user:delete', '用户删除', '{"category":"organization","resource":"user","action":"delete","description":"删除用户"}', 'enabled', 33),
-('99', 'PERMISSIONS', 'user:manage', '用户管理', '{"category":"organization","resource":"user","action":"manage","description":"全面管理用户"}', 'enabled', 34),
-('100', 'PERMISSIONS', 'system:dict:read', '数据字典查看', '{"category":"system","resource":"dict","action":"read","description":"查看数据字典"}', 'enabled', 22),
-('101', 'PERMISSIONS', 'system:dict:manage', '数据字典管理', '{"category":"system","resource":"dict","action":"manage","description":"管理数据字典"}', 'enabled', 23),
-('102', 'PERMISSIONS', 'system:config:read', '系统配置查看', '{"category":"system","resource":"config","action":"read","description":"查看系统配置"}', 'enabled', 24),
-('103', 'PERMISSIONS', 'system:config:manage', '系统配置管理', '{"category":"system","resource":"config","action":"manage","description":"管理系统配置"}', 'enabled', 25),
-('104', 'PERMISSIONS', 'system:logs:read', '系统日志查看', '{"category":"system","resource":"logs","action":"read","description":"查看系统日志"}', 'enabled', 26),
-('105', 'PERMISSIONS', 'logs:admin:read', '管理员日志查看', '{"category":"system","resource":"admin_logs","action":"read","description":"查看管理员操作日志"}', 'enabled', 27),
-('106', 'PERMISSIONS', 'logs:audit:read', '审计日志查看', '{"category":"system","resource":"audit_logs","action":"read","description":"查看审计日志"}', 'enabled', 28),
-('107', 'PERMISSIONS', 'monitor:alerts:read', '告警查看', '{"category":"monitoring","resource":"alerts","action":"read","description":"查看告警信息"}', 'enabled', 29),
-('108', 'PERMISSIONS', 'monitor:alerts:manage', '告警处理', '{"category":"monitoring","resource":"alerts","action":"manage","description":"处理告警"}', 'enabled', 30),
-('112', 'PERMISSIONS', 'device:read', '设备查看', '{"category":"system","resource":"device","action":"read","description":"查看设备信息"}', 'enabled', 36),
-('113', 'PERMISSIONS', 'device:manage', '设备管理', '{"category":"system","resource":"device","action":"manage","description":"管理设备"}', 'enabled', 37),
-('116', 'PERMISSIONS', 'device:clear', '设备数据清空', '{"category":"system","resource":"device","action":"clear","description":"清空设备所有会议数据（高危，不可逆）"}', 'enabled', 38),
-('118', 'PERMISSIONS', 'system:nameplate:manage', '电子铭牌管理', '{"category":"system","resource":"nameplate","action":"manage","description":"管理电子铭牌模板与手势密码"}', 'enabled', 39);
+
+('85', 'PERMISSIONS', 'role:read', '角色查看', '{"category":"personnel","resource":"role","action":"read","description":"查看角色信息"}', 'enabled', 10),
+('86', 'PERMISSIONS', 'role:write', '角色编辑', '{"category":"personnel","resource":"role","action":"write","description":"编辑角色权限"}', 'enabled', 11),
+('87', 'PERMISSIONS', 'role:delete', '角色删除', '{"category":"personnel","resource":"role","action":"delete","description":"删除角色"}', 'enabled', 12),
+('88', 'PERMISSIONS', 'role:manage', '角色管理', '{"category":"personnel","resource":"role","action":"manage","description":"管理角色权限"}', 'enabled', 13),
+
+('92', 'PERMISSIONS', 'org:read', '组织查看', '{"category":"organization","resource":"organization","action":"read","description":"查看组织架构"}', 'enabled', 20),
+('93', 'PERMISSIONS', 'org:manage', '组织管理', '{"category":"organization","resource":"organization","action":"manage","description":"管理组织架构（部门增删改）"}', 'enabled', 21),
+('94', 'PERMISSIONS', 'staff:read', '员工查看', '{"category":"organization","resource":"staff","action":"read","description":"查看员工信息"}', 'enabled', 22),
+('95', 'PERMISSIONS', 'staff:manage', '员工管理', '{"category":"organization","resource":"staff","action":"manage","description":"管理员工信息"}', 'enabled', 23),
+('96', 'PERMISSIONS', 'user:read', '用户查看', '{"category":"organization","resource":"user","action":"read","description":"查看用户信息"}', 'enabled', 24),
+('97', 'PERMISSIONS', 'user:write', '用户创建', '{"category":"organization","resource":"user","action":"write","description":"创建用户"}', 'enabled', 25),
+('98', 'PERMISSIONS', 'user:delete', '用户删除', '{"category":"organization","resource":"user","action":"delete","description":"删除用户"}', 'enabled', 26),
+('99', 'PERMISSIONS', 'user:manage', '用户管理', '{"category":"organization","resource":"user","action":"manage","description":"全面管理用户"}', 'enabled', 27),
+
+('91', 'PERMISSIONS', 'security:user:manage', '用户安全管理', '{"category":"security","resource":"user_security","action":"manage","description":"重置密码、启停用账号"}', 'enabled', 30),
+
+('100', 'PERMISSIONS', 'system:dict:read', '数据字典查看', '{"category":"system","resource":"dict","action":"read","description":"查看数据字典"}', 'enabled', 40),
+('101', 'PERMISSIONS', 'system:dict:manage', '数据字典管理', '{"category":"system","resource":"dict","action":"manage","description":"管理数据字典"}', 'enabled', 41),
+('102', 'PERMISSIONS', 'system:config:read', '安全策略查看', '{"category":"system","resource":"config","action":"read","description":"查看安全策略"}', 'enabled', 42),
+('103', 'PERMISSIONS', 'system:config:manage', '安全策略管理', '{"category":"system","resource":"config","action":"manage","description":"修改安全策略"}', 'enabled', 43),
+('104', 'PERMISSIONS', 'system:logs:read', '系统日志查看', '{"category":"system","resource":"logs","action":"read","description":"查看系统日志"}', 'enabled', 44),
+('105', 'PERMISSIONS', 'logs:admin:read', '操作日志查看', '{"category":"system","resource":"admin_logs","action":"read","description":"查看操作日志"}', 'enabled', 45),
+('106', 'PERMISSIONS', 'logs:audit:read', '审计日志查看', '{"category":"system","resource":"audit_logs","action":"read","description":"查看审计日志"}', 'enabled', 46);

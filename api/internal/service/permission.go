@@ -81,9 +81,10 @@ func (s *PermissionService) GetPermissionGroups(ctx context.Context) ([]response
 
 	// 转换为数组并排序
 	groups := make([]response.PermissionGroupResponse, 0, len(groupMap))
+	// 权限矩阵的分组顺序。业务项目新增 category 时在此追加，
+	// 并在 getCategoryName 里补中文名；未登记的 category 会被丢弃，不会显示。
 	categoryOrder := []string{
-		"workspace", "meeting", "sync", "personnel",
-		"organization", "security", "system", "monitoring",
+		"workspace", "personnel", "organization", "security", "system",
 	}
 
 	for _, category := range categoryOrder {
@@ -152,13 +153,10 @@ func (s *PermissionService) GetRolePermissionMatrix(ctx context.Context) ([]resp
 func (s *PermissionService) getCategoryName(category string) string {
 	categoryNames := map[string]string{
 		"workspace":    "工作台",
-		"meeting":      "会议管理",
-		"sync":         "同步管理",
 		"personnel":    "人员管理",
 		"organization": "组织架构",
 		"security":     "安全管理",
 		"system":       "系统管理",
-		"monitoring":   "监控告警",
 	}
 
 	if name, exists := categoryNames[category]; exists {

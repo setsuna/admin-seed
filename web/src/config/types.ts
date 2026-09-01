@@ -7,7 +7,6 @@ import type {
   HTTP_STATUS, 
   PERMISSIONS, 
   USER_ROLES, 
-  MEETING_STATUS,
   FILE_TYPES,
   NOTIFICATION_TYPES,
   THEMES,
@@ -20,7 +19,6 @@ export type ApiPath = typeof API_PATHS[keyof typeof API_PATHS]
 export type HttpStatus = typeof HTTP_STATUS[keyof typeof HTTP_STATUS]
 export type Permission = typeof PERMISSIONS[keyof typeof PERMISSIONS]
 export type UserRole = typeof USER_ROLES[keyof typeof USER_ROLES]
-export type MeetingStatus = typeof MEETING_STATUS[keyof typeof MEETING_STATUS]
 export type FileType = typeof FILE_TYPES[keyof typeof FILE_TYPES]
 export type NotificationType = typeof NOTIFICATION_TYPES[keyof typeof NOTIFICATION_TYPES]
 export type Theme = typeof THEMES[keyof typeof THEMES]
