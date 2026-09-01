@@ -1,0 +1,24 @@
+@import './styles/globals.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 滚动条样式 - 响应主题变化 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}

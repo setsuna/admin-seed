@@ -1,0 +1,397 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* ============================================================
+   * 主题系统 —— 对齐平板端 SealMeet
+   *
+   * 模型：中性色 / 语义色全局固定（暖灰基调），仅「品牌色」可换肤。
+   * 每套品牌色含 4 要素：
+   *   --brand       主色
+   *   --brand-dark  深色（悬停/点击/渐变终点）
+   *   --tint        浅色实色底（选中态/高亮底）
+   *   --glow        阴影/涟漪用（与 brand 同色，用时叠 alpha）
+   *
+   * 两个正交维度：
+   *   品牌色 → [data-brand="..."]（10 套）
+   *   明暗   → .dark（仅切换中性色一档）
+   *
+   * 禁止在具体主题里重写 secondary / muted / accent / border，
+   * 它们是中性色，不得随品牌色漂移。
+   * ============================================================ */
+
+  /* ---------- 品牌色调色板（10 套，与平板端 BrandPalettes 一致）---------- */
+
+  /* 默认：深石榴红 #8C1D22 */
+  :root,
+  [data-brand='pomegranate'] {
+    --brand: 357 66% 33%;
+    --brand-dark: 357 71% 22%;
+    --tint: 0 60% 96%;
+    --glow: 357 66% 33%;
+  }
+
+  /* 中国红 #C0181F */
+  [data-brand='china-red'] {
+    --brand: 357 78% 42%;
+    --brand-dark: 357 80% 31%;
+    --tint: 0 77% 96%;
+    --glow: 357 78% 42%;
+  }
+
+  /* 酒红 #7A1E2B */
+  [data-brand='wine'] {
+    --brand: 349 60% 30%;
+    --brand-dark: 349 63% 19%;
+    --tint: 345 45% 96%;
+    --glow: 349 60% 30%;
+  }
+
+  /* 朱砂红 #B5341B */
+  [data-brand='cinnabar'] {
+    --brand: 12 74% 41%;
+    --brand-dark: 12 76% 28%;
+    --tint: 20 60% 96%;
+    --glow: 12 74% 41%;
+  }
+
+  /* 科技蓝 #1677FF */
+  [data-brand='tech-blue'] {
+    --brand: 217 100% 54%;
+    --brand-dark: 217 90% 41%;
+    --tint: 217 100% 97%;
+    --glow: 217 100% 54%;
+  }
+
+  /* 靖蓝 #4F46E5 */
+  [data-brand='indigo'] {
+    --brand: 243 75% 59%;
+    --brand-dark: 245 50% 42%;
+    --tint: 245 87% 97%;
+    --glow: 243 75% 59%;
+  }
+
+  /* 极客紫 #7C3AED */
+  [data-brand='geek-purple'] {
+    --brand: 262 83% 58%;
+    --brand-dark: 263 70% 42%;
+    --tint: 262 87% 97%;
+    --glow: 262 83% 58%;
+  }
+
+  /* 科技青 #0E9488 */
+  [data-brand='tech-teal'] {
+    --brand: 175 83% 32%;
+    --brand-dark: 175 72% 24%;
+    --tint: 168 43% 95%;
+    --glow: 175 83% 32%;
+  }
+
+  /* 活力橙 #F2630C */
+  [data-brand='vivid-orange'] {
+    --brand: 23 90% 50%;
+    --brand-dark: 21 89% 40%;
+    --tint: 27 82% 96%;
+    --glow: 23 90% 50%;
+  }
+
+  /* 墨黑 #1F2937 */
+  [data-brand='ink-black'] {
+    --brand: 215 28% 17%;
+    --brand-dark: 222 40% 8%;
+    --tint: 220 16% 95%;
+    --glow: 215 28% 17%;
+  }
+
+  /* ---------- 浅色模式：中性色固定（暖灰基调）---------- */
+  :root {
+    --radius: 0.5rem;
+
+    /* 品牌色派生 token（勿在具体主题里重写） */
+    --primary: var(--brand);
+    --primary-foreground: 0 0% 100%;
+    --primary-default: var(--brand);
+    --primary-hover: var(--brand-dark);
+    --primary-active: var(--brand-dark);
+    --primary-disabled: 30 8% 78%;
+    --ring: var(--brand);
+
+    /* 中性色 —— 极浅灰页面底 + 白卡片，靠边框与背景差分层 */
+    --bg-page: 0 0% 98%;          /* #FAFAFA 页面背景（最外层） */
+    --bg-container: 0 0% 96%;     /* #F5F5F5 容器次级背景 */
+    --bg-card: 0 0% 100%;         /* #FFFFFF 卡片 */
+    --bg-elevated: 0 0% 100%;     /* #FFFFFF 悬浮层 */
+
+    /* ⚠️ --background 是 shadcn 的「基础画布色」，大量组件（表格、
+       容器、面板）默认不设背景，直接透出它。必须保持纯白，
+       否则卡片会与页面背景糊成一片。页面外层暖灰请用 bg-bg-page。 */
+    --background: 0 0% 100%;
+    --foreground: 0 0% 15%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 15%;
+
+    /* 次要元素：中性浅灰，不带品牌色倾向 */
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 20%;
+    --secondary-default: 0 0% 96%;
+    --secondary-hover: 0 0% 93%;
+    --secondary-active: 0 0% 89%;
+    --secondary-disabled: 0 0% 97%;
+
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 47%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 20%;
+
+    --border: 0 0% 91%;           /* 中性浅灰边框 */
+    --input: 0 0% 88%;            /* 输入框边框 */
+    --input-bg: 0 0% 100%;        /* 输入框底：白 */
+
+    /* 文本 —— 中性灰度，全局固定 */
+    --text-primary: 0 0% 15%;     /* 一级标题 */
+    --text-secondary: 0 0% 33%;   /* #545454 二级标题 */
+    --text-regular: 0 0% 52%;     /* #848484 正文 */
+    --text-tertiary: 0 0% 66%;    /* 辅助文字 */
+    --text-inverse: 0 0% 100%;
+
+    --destructive: 4 72% 44%;     /* #C0291F */
+    --destructive-foreground: 0 0% 100%;
+
+    /* Sidebar（中性，仅选中态用品牌色） */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 33%;
+    --sidebar-primary: var(--brand);
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: var(--tint);
+    --sidebar-accent-foreground: var(--brand-dark);
+    --sidebar-border: 0 0% 91%;
+    --sidebar-ring: var(--brand);
+
+    /* 语义色 —— 全局固定，不随主题变化 */
+    --success: 152 60% 30%;       /* #1F7A4D */
+    --warning: 21 89% 40%;        /* #C2410C */
+    --info: 210 44% 41%;          /* #3B6695 */
+    --error: 4 72% 44%;           /* #C0291F */
+    --gov-gold: 41 47% 59%;       /* #C9A961 */
+
+    /* 弹窗遮罩 rgba(30,12,12,.55) */
+    --scrim: 0 43% 8%;
+
+    /* 空间与阴影 */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  }
+
+  /* ---------- 深色模式：只换中性色一档，品牌色不变 ---------- */
+  .dark {
+    --primary: var(--brand);
+    --primary-foreground: 0 0% 100%;
+    --primary-default: var(--brand);
+    /* 深色底上悬停应更亮，不能用 brand-dark */
+    --primary-hover: var(--brand);
+    --primary-active: var(--brand-dark);
+    --primary-disabled: 0 0% 30%;
+
+    --bg-page: 0 0% 7%;
+    --bg-container: 0 0% 10%;
+    --bg-card: 0 0% 15%;
+    --bg-elevated: 0 0% 20%;
+
+    --background: 0 0% 7%;
+    --foreground: 0 0% 95%;
+    --card: 0 0% 15%;
+    --card-foreground: 0 0% 95%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 0 0% 95%;
+
+    --secondary: 0 0% 20%;
+    --secondary-foreground: 0 0% 92%;
+    --secondary-default: 0 0% 20%;
+    --secondary-hover: 0 0% 24%;
+    --secondary-active: 0 0% 28%;
+    --secondary-disabled: 0 0% 16%;
+
+    --muted: 0 0% 20%;
+    --muted-foreground: 0 0% 62%;
+    --accent: 0 0% 22%;
+    --accent-foreground: 0 0% 92%;
+
+    --border: 0 0% 22%;
+    --input: 0 0% 26%;
+    --input-bg: 0 0% 13%;
+
+    --text-primary: 0 0% 95%;
+    --text-secondary: 0 0% 82%;
+    --text-regular: 0 0% 65%;
+    --text-tertiary: 0 0% 48%;
+    --text-inverse: 0 0% 15%;
+
+    --destructive: 4 65% 52%;
+    --destructive-foreground: 0 0% 100%;
+
+    --sidebar-background: 0 0% 10%;
+    --sidebar-foreground: 0 0% 82%;
+    --sidebar-primary: var(--brand);
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 20%;
+    --sidebar-accent-foreground: 0 0% 92%;
+    --sidebar-border: 0 0% 22%;
+    --sidebar-ring: var(--brand);
+
+    /* 语义色：深色底下提亮以保证对比度 */
+    --success: 152 45% 45%;
+    --warning: 21 75% 55%;
+    --info: 210 50% 60%;
+    --error: 4 65% 58%;
+    --gov-gold: 41 50% 65%;
+  }
+
+  /* 墨黑主题：brand 本身已很暗，浅色底下悬停需反向提亮 */
+  [data-brand='ink-black']:not(.dark) {
+    --primary-hover: 215 25% 25%;
+  }
+
+  /* 深色模式 + 墨黑：brand 与背景几乎同色，改用浅灰作主色 */
+  .dark[data-brand='ink-black'] {
+    --primary: 215 20% 65%;
+    --primary-foreground: 222 40% 8%;
+    --primary-hover: 215 20% 72%;
+    --primary-active: 215 20% 58%;
+    --sidebar-primary: 215 20% 65%;
+    --sidebar-primary-foreground: 222 40% 8%;
+    --ring: 215 20% 65%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  html {
+    @apply overflow-x-hidden;
+  }
+  body {
+    @apply min-h-svh w-full bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* 统一 date/time 输入框的选择器图标：
+     Chrome 原生的日历/时钟是两张不同素材，时钟图形在画布内自带留白，
+     单靠归零 margin/padding 无法对齐观感。这里用 background-color + mask
+     替换为统一的自绘图标（lucide Calendar/Clock）：盒模型与图形留白完全
+     一致，颜色跟随主题 token，background 简写会同时清掉原生图标的
+     background-image */
+  input[type='date']::-webkit-calendar-picker-indicator,
+  input[type='time']::-webkit-calendar-picker-indicator {
+    width: 14px;
+    height: 14px;
+    margin: 0 0 0 4px;
+    padding: 0;
+    cursor: pointer;
+    background: hsl(var(--text-regular));
+    -webkit-mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    opacity: 0.85;
+    transition: opacity 0.15s;
+  }
+  input[type='date']::-webkit-calendar-picker-indicator:hover,
+  input[type='time']::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+  }
+  input[type='date']::-webkit-calendar-picker-indicator {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 2v4'/%3E%3Cpath d='M16 2v4'/%3E%3Crect width='18' height='18' x='3' y='4' rx='2'/%3E%3Cpath d='M3 10h18'/%3E%3C/svg%3E");
+  }
+  /* 时钟圆用 r=9（而非 lucide 默认的 10），使内容横跨 x=3..21，
+     与日历 rect 的内容边界（3..21）对齐，保证两者左右留白（观感上的边距）一致。 */
+  input[type='time']::-webkit-calendar-picker-indicator {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpolyline points='12 6 12 12 16 14'/%3E%3C/svg%3E");
+  }
+}
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .faded-bottom {
+    @apply after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:hidden after:h-32 after:w-full after:bg-[linear-gradient(180deg,_transparent_10%,_hsl(var(--background))_70%)] after:md:block;
+  }
+}
+
+@layer components {
+  /* Allotment 自定义样式 */
+  
+  /* 分割线样式优化 */
+  
+  /* 状态指示器 */
+  .status-online {
+    @apply inline-flex h-2 w-2 rounded-full bg-success;
+  }
+  
+  .status-offline {
+    @apply inline-flex h-2 w-2 rounded-full bg-muted-foreground;
+  }
+  
+  .status-warning {
+    @apply inline-flex h-2 w-2 rounded-full bg-warning;
+  }
+  
+  .status-error {
+    @apply inline-flex h-2 w-2 rounded-full bg-error;
+  }
+  
+  /* 卡片样式 */
+  .card {
+    @apply rounded-lg border bg-card text-card-foreground shadow-sm;
+  }
+  
+  /* 数据表格样式 */
+  .data-table {
+    @apply w-full border-collapse border-spacing-0;
+  }
+  
+  .data-table th {
+    @apply border-b px-4 py-2 text-left font-medium text-muted-foreground;
+  }
+  
+  .data-table td {
+    @apply border-b px-4 py-2;
+  }
+  
+  /* 滚动条样式 */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}

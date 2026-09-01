@@ -1,0 +1,17 @@
+# 依赖
+node_modules/
+# 构建产物
+web/dist/
+api/bin/
+api/static/
+# 运行时数据
+api/data/
+api/logs/
+api/files/
+api/tmp/
+# 本地配置与密钥
+api/.env
+web/.env.local
+api/certs/
+# 系统
+.DS_Store

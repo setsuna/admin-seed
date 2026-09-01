@@ -1,0 +1,5 @@
+export { default as Dashboard } from './Dashboard'
+export { default as LoginPage } from './LoginPage'
+export { default as DataDictionaryPage } from './DataDictionaryPage'
+export { default as DepartmentPage } from './DepartmentPage'
+export { default as UserManagePage } from './UserManagePage'

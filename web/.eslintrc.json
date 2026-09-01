@@ -1,0 +1,139 @@
+{
+  "root": true,
+  "env": { "browser": true, "es2020": true },
+  "extends": [
+    "eslint:recommended",
+    "@typescript-eslint/recommended",
+    "eslint:recommended",
+    "@typescript-eslint/recommended-requiring-type-checking"
+  ],
+  "ignorePatterns": ["dist", ".eslintrc.cjs", "*.backup", ".old_*"],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "project": ["./tsconfig.json"]
+  },
+  "plugins": ["react-refresh", "@typescript-eslint"],
+  "rules": {
+    // React规则
+    "react-refresh/only-export-components": [
+      "warn",
+      { "allowConstantExport": true }
+    ],
+    
+    // 架构重构后的导入规则
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": ["@/components/ui", "@/components/features", "@/components/business"],
+            "message": "不允许从统一导出导入。请直接导入具体组件: import { Button } from '@/components/ui/Button'"
+          },
+          {
+            "group": ["@/hooks"],
+            "message": "不允许从统一导出导入。请直接导入具体hook: import { usePermission } from '@/hooks/usePermission'"
+          },
+          {
+            "group": ["@/services/mock*", "@/mock*"],
+            "message": "Mock相关导入已在架构重构中移除"
+          }
+        ],
+        "paths": [
+          {
+            "name": "@/components",
+            "message": "请使用具体的组件路径，如 '@/components/ui/Button' 或 '@/components/business/user/UserCard'"
+          }
+        ]
+      }
+    ],
+
+    // TypeScript严格检查
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      { 
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ],
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/prefer-const": "error",
+    "@typescript-eslint/no-non-null-assertion": "warn",
+    
+    // 类型导入规范
+    "@typescript-eslint/consistent-type-imports": [
+      "error",
+      {
+        "prefer": "type-imports",
+        "disallowTypeAnnotations": false
+      }
+    ],
+
+    // 代码质量规则
+    "prefer-const": "error",
+    "no-var": "error",
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "no-debugger": "error",
+    
+    // 现代JavaScript特性
+    "object-shorthand": "error",
+    "prefer-destructuring": [
+      "error",
+      {
+        "array": true,
+        "object": true
+      },
+      {
+        "enforceForRenamedProperties": false
+      }
+    ],
+
+    // 架构一致性检查
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "ImportDeclaration[source.value='@/store'] ImportSpecifier[imported.name='useGlobalStore']",
+        "message": "推荐使用新的选择器hooks: useAuth(), useUI(), useApp()"
+      }
+    ]
+  },
+  "settings": {
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true,
+        "project": "./tsconfig.json"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": [
+          "warn",
+          { 
+            "argsIgnorePattern": "^_",
+            "varsIgnorePattern": "^_",
+            "caughtErrorsIgnorePattern": "^_"
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/types/**/*.ts"],
+      "rules": {
+        // 类型定义文件允许更灵活的规则
+        "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/ban-types": "off"
+      }
+    },
+    {
+      "files": ["src/config/**/*.ts"],
+      "rules": {
+        // 配置文件可以使用any类型
+        "@typescript-eslint/no-explicit-any": "off"
+      }
+    }
+  ]
+}
