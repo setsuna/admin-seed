@@ -183,6 +183,55 @@ logo 是内联 SVG（`components/ui/Logo.tsx` 的 `<Mark>`），用 `currentColo
 卡片默认**只有边框、没有常驻阴影**——浅色系里阴影几乎不可见，反而让边缘发糊。
 需要"浮起"效果时用 `<Card variant="lift">`，hover 才加阴影。
 
+## 授权 / License（种子不含，需要时移植）
+
+种子**不带**软件授权（防盗版）能力。原 `meeting-api` 有一套完整实现，
+剥离时整体去掉了，需要时按下方说明移植回来。
+
+### 先想清楚要哪一种「授权」
+
+这两件事常被混为一谈，实现完全不同：
+
+| | 软件 License | 业务授权 |
+|---|---|---|
+| 目的 | 防客户盗版（一份授权装多台） | 向客户收钱（到期停服） |
+| 绑定 | 主板/CPU/磁盘序列号 + 网卡 MAC | 业务表里的起止日期字段 |
+| 载体 | 签名的 license 文件 + 申请码 | 数据库 + 续费订单 |
+| 场景 | 软件私有化交付给客户部署 | 自己运营的 SaaS |
+
+**自己运营的系统要的是右边那种**，用几个字段 + 一张续费单表就够了，不要移植 License。
+
+### 移植说明（仅私有化交付场景）
+
+源：`meeting-api` 的 `internal/license/`（约 1,800 行）+ `internal/protection/`（约 240 行）。
+
+能力：硬件指纹绑定、离线申请码/激活、到期与设备数上限、防改系统时间的
+TimeAnchor（记录 BootCount / TotalRunHours）。
+
+**4 个挂载点**（剥离时就是从这几处摘掉的，接回去照做即可）：
+
+1. `cmd/server/main.go` —— 启动时 `license.InitLicenseConfig(cfg)` + `license.SetLogger(logger)`；
+   如需环境校验再加 `protection.NewEnvironmentValidator().ValidateWithRetry(3)`
+2. `internal/handler/handlers.go` —— 构造 `licenseCache := license.NewLicenseCache(5*time.Minute)`，
+   注入 AuthHandler，并挂到 `Handlers.LicenseCache`
+3. `internal/handler/auth/auth.go` —— 登录与刷新 Token 前调 `licenseCache.ValidateWithError()`；
+   失败时返回申请码供客户激活（前端需配一个激活弹窗，参考原项目的 `AuthErrorModal.tsx`）
+4. `internal/router/router.go` —— `protected.Use(middleware.LicenseCheckMiddleware(h.LicenseCache))`
+   做运行时校验，并注册 `system.RegisterLicenseRoutes(v1, h.License)` 免认证的激活接口
+
+前端另需：`services/api/license.api.ts` + `components/ui/AuthErrorModal.tsx`。
+
+### 移植前必读的三个坑
+
+- **硬件指纹靠 shell 命令采集**（`dmidecode` / `wmic` / `ioreg` / `system_profiler`）。
+  Docker 容器里通常拿不到主板与磁盘序列号，**容器化部署基本不可用**；
+  云主机实例迁移或重建后指纹会变，授权失效。
+- **TimeAnchor 防改时间**在容器重启、NTP 校时的环境下容易误伤。
+- **它侵入认证链路**，不是挂在旁边的独立模块 —— 登录失败会变成授权错误码，
+  排查登录问题时要先排除它。
+
+**联网部署的系统不要用硬件绑定**，用在线激活 + 心跳校验更可靠也更简单。
+
 ## 排错
 
 **启动后浏览器报 500 / 页面打不开**，先按这三步查：
