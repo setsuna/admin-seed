@@ -39,7 +39,6 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar'
 import { useMenuPermission } from '@/hooks/usePermission'
-import { usePolicy } from '@/hooks/usePolicy'
 import {
   Collapsible,
   CollapsibleContent,
@@ -86,21 +85,7 @@ function getIconComponent(
 
 // Logo 组件
 function AppLogo() {
-  const { policy } = usePolicy()
   const { state } = useSidebar()
-
-  // 密级文本映射
-  const securityLevelText: Record<string, string> = {
-    confidential: '秘密级',
-    secret: '机密级',
-  }
-
-  // 获取密级标识
-  const getSecurityLevelBadge = () => {
-    if (!policy?.systemSecurityLevel) return null
-    const levelText = securityLevelText[policy.systemSecurityLevel]
-    return levelText ? `${levelText}` : null
-  }
 
   return (
     <SidebarMenu>
@@ -124,11 +109,6 @@ function AppLogo() {
                   {APP_MAJOR_VERSION}
                 </span>
               </div>
-              {getSecurityLevelBadge() && (
-                <span className="truncate text-xs text-sidebar-foreground/70">
-                  {getSecurityLevelBadge()}
-                </span>
-              )}
             </div>
           )}
         </div>

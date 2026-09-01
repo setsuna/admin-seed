@@ -4,7 +4,9 @@ import { cva, type VariantProps } from 'class-variance-authority'
 
 // Card 动画变体
 const cardVariants = cva(
-  'rounded-xl border bg-card text-card-foreground shadow',
+  // 浅色系下阴影几乎不可见，反而让边缘发糊；灰底 + 1px 边框已足够区分层级。
+  // 需要“浮起”效果的场景用 variant="lift"（hover 时才加阴影）。
+  'rounded-xl border bg-card text-card-foreground',
   {
     variants: {
       // 悬停动画效果

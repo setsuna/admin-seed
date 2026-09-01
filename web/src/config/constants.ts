@@ -5,73 +5,31 @@
 
 // API路径前缀配置
 export const API_PATHS = {
-  // 数据字典
-  DICTIONARIES: '/dictionaries',
-  
-  // 会议管理
-  MEETINGS: '/meetings',
-  MEETING_DRAFTS: '/meetings/draft',
-  MEETING_FILES: '/meetings/{id}/files',
-  
-  // 用户管理
-  USERS: '/users',
-  ROLES: '/roles',
-  ROLE_PERMISSION_MATRIX: '/roles/permission-matrix',
-  PERMISSIONS: '/permissions',
-  
-  // 部门管理
-  DEPARTMENTS: '/departments',
-  DEPARTMENT_TREE: '/departments/tree',
-  DEPARTMENT_OPTIONS: '/departments/options',
-  
-  // 设备管理
-  DEVICES: '/devices',
-  
-  // 认证相关
+  // 认证
   AUTH_LOGIN: '/auth/login',
   AUTH_LOGOUT: '/auth/logout',
   AUTH_REFRESH: '/auth/refresh',
   AUTH_PROFILE: '/auth/profile',
-  
-  // 文件上传
-  FILE_UPLOAD: '/files/upload',
-  FILE_DOWNLOAD: '/files/{id}/download',
-  
-  // 配置管理
-  CONFIGS: '/configs',
-  CONFIG_VALIDATE_YAML: '/configs/validate-yaml',
-  CONFIG_EXPORT: '/configs/{id}/export',
-  CONFIG_IMPORT: '/configs/import',
-  
-  // 策略配置
+
+  // 用户与权限
+  USERS: '/users',
+  ROLES: '/roles',
+  ROLE_PERMISSION_MATRIX: '/roles/permission-matrix',
+  PERMISSIONS: '/permissions',
+
+  // 组织
+  DEPARTMENTS: '/departments',
+  DEPARTMENT_TREE: '/departments/tree',
+  DEPARTMENT_OPTIONS: '/departments/options',
+
+  // 平台
+  DICTIONARIES: '/dictionaries',
+  MENUS_USER_CONFIG: '/menus/user-config',
+  DASHBOARD: '/dashboard',
   POLICY: '/policy',
-  POLICY_VALIDATE: '/policy/validate',
   POLICY_DEFAULT: '/policy/default',
-  POLICY_EXPORT: '/policy/export',
-  
-  // 授权管理
-  LICENSE_STATUS: '/license/status',
-  LICENSE_APPLICATION_CODE: '/license/application-code',
-  LICENSE_IMPORT: '/license/import',
-  LICENSE_VALIDATE: '/license/validate',
-  LICENSE_REFRESH: '/license/refresh',
-  LICENSE_DETAILS: '/license/details',
-  LICENSE_EXPORT: '/license/export',
-  LICENSE_RESET: '/license/reset',
-  
-  // 日志管理
   LOGS: '/logs',
   LOGS_THREE_ADMIN: '/logs/three-admin',
-  
-  // 终端日志
-  DEVICE_LOGS: '/device-logs',
-  DEVICE_LOGS_STATS: '/device-logs/stats',
-
-  // 归档管理
-  ARCHIVES: '/archives',
-
-  // 仪表板
-  DASHBOARD: '/dashboard',
 } as const
 
 // HTTP状态码配置

@@ -70,7 +70,7 @@ func seedDefaultAdmins(db *sql.DB) error {
 
 	defaultAdmins := []adminConfig{
 		{
-			Username:    "xunyidi",
+			Username:    "admin",
 			Name:        "管理员",
 			Role:        "admin",
 			Permissions: `["dashboard:view","meeting:read","meeting:write","meeting:delete","meeting:manage","sync:read","sync:manage","personnel:read","personnel:write","personnel:delete","personnel:manage","role:read","role:write","role:delete","role:manage","security:read","security:manage","org:read","org:manage","staff:read","staff:manage","user:read","user:write","user:delete","user:manage","system:dict:read","system:dict:manage","system:config:read","system:config:manage","system:logs:read","logs:admin:read","logs:audit:read","monitor:alerts:read","monitor:alerts:manage","device:read","device:manage"]`,

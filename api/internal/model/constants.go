@@ -9,20 +9,20 @@ const (
 	RoleAuditAdmin    = "audit_admin"    // 审计员（三员）
 )
 
-// 超级管理员用户名（不记录操作日志）
-var SuperAdminUsernames = []string{
-	"admin",
-	"xunyidi",
-	"administrator",
-}
+// SuperAdminUsernames 审计豁免名单：名单内账号的写操作不记录到操作日志。
+//
+// 种子默认为空 —— 所有账号的操作都会被审计，「操作日志」页开箱即有数据。
+// 原项目把内置管理员放进了这里，导致用默认账号登录后操作日志永远是空的，
+// 排查起来很困惑，故种子改为默认不豁免。
+// 确有需要（例如运维巡检账号刷屏）再往里加。
+var SuperAdminUsernames = []string{}
 
-// SystemHiddenUsernames 系统内置账号（接口列表不返回给前端）
-var SystemHiddenUsernames = []string{
-	"auditadm",
-	"sysadm",
-	"secadm",
-	"xunyidi",
-}
+// SystemHiddenUsernames 用户列表接口不返回的账号。
+//
+// 种子默认为空 —— 「用户管理」页能看到全部内置账号，否则会出现
+// 「明明建了 5 个账号，列表里只有 1 个」的困惑。
+// 生产环境如需隐藏运维专用账号，再往里加。
+var SystemHiddenUsernames = []string{}
 
 // 三员角色列表
 var ThreeAdminRoles = []string{

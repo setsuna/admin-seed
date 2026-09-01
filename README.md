@@ -16,7 +16,7 @@ admin-seed/
 ```bash
 # 后端
 cd api
-cp .env.example .env          # 默认 sqlite + 8080 端口，可改
+cp .env.example .env          # 默认 sqlite + 8080 端口，可在 .env 里改 SERVER_PORT
 go mod tidy && go run ./cmd/server
 
 # 前端（另开终端）
@@ -28,7 +28,7 @@ npm install && npm run dev
 
 | 账号 | 角色 | 初始密码 |
 |---|---|---|
-| xunyidi | admin 管理员 | 1234QWer |
+| admin | admin 管理员 | 1234QWer |
 | secadm | security_admin 安全管理员 | 1234QWer |
 | sysadm | system_admin 系统管理员 | 1234QWer |
 | auditadm | audit_admin 审计员 | 1234QWer |
@@ -116,6 +116,43 @@ Go 服务会把 `./static` 作为 SPA 根目录并处理前端路由 fallback。
 4. `src/pages/DeviceListPage.tsx` 写页面
 5. `src/utils/routeGenerator.tsx` 登记懒加载组件（key 要与菜单一致）
 6. 数据库 `MENU_ITEMS` 字典加一条菜单项
+
+## 视觉规范
+
+后台的层级靠**背景灰度**建立，不靠阴影：
+
+| 层 | token | 值 | 说明 |
+|---|---|---|---|
+| 页面底 | `--bg-page` | `#F5F5F5` | 内容区最外层，用 `bg-bg-page` |
+| 卡片 / 表格 | `--card` | `#FFFFFF` | 白底，1px 边框 |
+| 边框 | `--border` | `#E8E8E8` | 卡片与分隔线 |
+
+两条硬规则：
+
+1. **页面底与卡片必须拉开 ≥4% 灰度。** 原值是 `#FAFAFA`（只差 2%），
+   在表格页会和白色表格糊成一片，看着像"脏白"而不像刻意的灰。
+2. **不要用纯白当页面底。** shadcn 的 `--background` 必须保持纯白（大量组件默认透出它），
+   页面外层一律用 `bg-bg-page`。纯白底 + 白卡片时，卡片边界、分页条、表头全部失去容器感。
+
+卡片默认**只有边框、没有常驻阴影**——浅色系里阴影几乎不可见，反而让边缘发糊。
+需要"浮起"效果时用 `<Card variant="lift">`，hover 才加阴影。
+
+## 排错
+
+**启动后浏览器报 500 / 页面打不开**，先按这三步查：
+
+1. **是不是有旧进程占着端口。** `go run` 起的进程叫 `server`，用
+   `pkill -f "bin/server"` 杀不掉，得 `lsof -nP -iTCP:<端口> -sTCP:LISTEN`
+   看谁占着、再按 PID kill。端口被占时服务会 FATAL 退出，
+   而浏览器打到的是那个旧进程，行为与当前代码不一致。
+2. **改了表结构没重编译。** Repository 用 `SELECT *` + 按列序 Scan，
+   加了字段但二进制是旧的，会 500 并在服务端日志里报
+   `expected N destination arguments in Scan, not M`。
+3. **前后端加密开关不一致。** `VITE_CRYPTO_ENABLE` 与 `CRYPTO_ENABLE`
+   必须同为 true 或同为 false，否则登录必失败（且提示是"用户名或密码错误"）。
+
+服务端日志在 `logs/`，或直接看启动时的 stdout —— 每个 500 都会打印
+`[ERROR] Repository错误` 及具体 SQL 错误，比浏览器控制台的信息多得多。
 
 ## 已知待办
 
