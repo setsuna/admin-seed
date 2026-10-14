@@ -46,7 +46,7 @@ type UpdatePolicyRequest struct {
 // PasswordPolicyRequest 口令策略
 type PasswordPolicyRequest struct {
 	MinLength              int  `json:"minLength" binding:"required,min=6,max=32"`
-	ChangeIntervalDays     int  `json:"changeIntervalDays" binding:"required,min=0,max=365"`
+	ChangeIntervalDays     int  `json:"changeIntervalDays" binding:"min=0,max=365"` // 0 = 不过期（required 会把 0 当成没填而拒掉）
 	MaxFailAttempts        int  `json:"maxFailAttempts" binding:"required,min=1,max=10"`
 	LockoutDurationMinutes int  `json:"lockoutDurationMinutes" binding:"required,min=1,max=1440"`
 	RequireUppercase       bool `json:"requireUppercase"`

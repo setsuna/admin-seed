@@ -477,15 +477,16 @@ const PolicyConfigPage = () => {
                   type="number"
                   value={policy.passwordPolicy.changeIntervalDays}
                   onChange={(e) => {
-                    let val = parseInt(e.target.value) || 30
-                    if (val < 1) val = 1
+                    // 0 = 不过期：不能写成 `parseInt(...) || 30`，那样填 0 会被改回 30
+                    let val = parseInt(e.target.value)
+                    if (Number.isNaN(val) || val < 0) val = 0
                     if (val > 30) val = 30
                     updatePolicyField('passwordPolicy.changeIntervalDays', val)
                   }}
-                  min="1"
+                  min="0"
                   max="30"
                 />
-                <p className="text-xs text-gray-500 mt-1">最大30天</p>
+                <p className="text-xs text-gray-500 mt-1">0 表示密码永不过期，最大 30 天</p>
               </div>
             </div>
             
