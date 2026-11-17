@@ -43,7 +43,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/Collapsible'
+} from '@/components/ui/collapsible'
 import { cn } from '@/utils'
 
 // 图标映射
@@ -90,7 +90,7 @@ function AppLogo() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <div className="flex items-center gap-2 px-2 py-2">
+        <div className="flex items-center gap-2 px-2">
           {/* 方形标记：侧边栏收起时仅剩 32px 宽，只显示图形不显示文字 */}
           <Mark size={32} className="shrink-0 text-primary" />
           {state === 'expanded' && (
@@ -180,8 +180,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   )
 
   return (
-    <Sidebar collapsible="icon" variant="floating" {...props}>
-      <SidebarHeader>
+    <Sidebar collapsible="icon" {...props}>
+      {/* 与右侧顶栏同高、同一条底边线，两边横线对齐 */}
+      <SidebarHeader className="h-header shrink-0 justify-center border-b border-sidebar-border px-2 py-0">
         <AppLogo />
       </SidebarHeader>
 

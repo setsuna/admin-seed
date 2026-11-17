@@ -24,6 +24,7 @@ export type ThemeMode = 'light' | 'dark' | 'system'
 
 /** 品牌色（10 套，与平板端 BrandPalettes 一致） */
 export type BrandTheme =
+  | 'neutral'       // 默认：shadcn 原版中性色（不换肤）
   | 'pomegranate'   // 深石榴红（默认）
   | 'china-red'     // 中国红
   | 'wine'          // 酒红
@@ -34,6 +35,13 @@ export type BrandTheme =
   | 'tech-teal'     // 科技青
   | 'vivid-orange'  // 活力橙
   | 'ink-black'     // 墨黑
+
+/**
+ * 界面密度（第三个正交维度，与明暗、品牌色互不影响）
+ *   comfortable  舒展卡片风
+ *   compact      紧凑数据风
+ */
+export type UIDensity = 'comfortable' | 'compact'
 
 /**
  * @deprecated 旧的单维度主题类型。已拆分为 ThemeMode + BrandTheme。

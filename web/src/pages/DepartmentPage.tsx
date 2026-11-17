@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Plus, Edit, Trash2, Search, RefreshCw, Building2, Users, Phone, Mail } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
-import { Card, CardContent } from '@/components/ui/Card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent } from '@/components/ui/card'
 import { DataTable } from '@/components/features/DataTable'
-import { Select } from '@/components/ui/Select'
+import { Select } from '@/components/ui/option-select'
 import { StatusIndicator } from '@/components/ui/StatusIndicator'
 import { Loading } from '@/components/ui/Loading'
 import { FormModal } from '@/components/ui/FormModal'
@@ -295,7 +295,7 @@ const DepartmentPage = () => {
     return (
       <div className="p-6">
         <Card>
-          <CardContent className="pt-6">
+          <CardContent>
             <div className="text-center text-destructive">
               加载失败：{(error as any)?.message || '未知错误'}
               <Button onClick={() => refreshData()} className="ml-2">
@@ -333,7 +333,7 @@ const DepartmentPage = () => {
       
       {/* 筛选和操作区域 */}
       <Card>
-        <CardContent className="pt-6">
+        <CardContent>
           <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
               <Input
@@ -403,7 +403,7 @@ const DepartmentPage = () => {
       </div>
       
       {/* 数据展示区域 */}
-      <Card>
+      <Card className="gap-0 overflow-hidden py-0">
         <CardContent className="p-0">
           {isLoading ? (
             <div className="p-8">

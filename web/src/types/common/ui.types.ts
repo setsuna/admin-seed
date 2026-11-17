@@ -56,6 +56,12 @@ export interface TableColumn<T = any> {
   width?: string | number
   align?: 'left' | 'center' | 'right'
   render?: (value: any, record: T, index: number) => React.ReactNode
+  /** 超出 width 时省略号截断，悬停看全文（需同时设置 width） */
+  ellipsis?: boolean
+  /** 能否在「列设置」里隐藏，默认 true；操作列等应设 false */
+  hideable?: boolean
+  /** 默认隐藏（用户可在「列设置」里打开） */
+  defaultHidden?: boolean
 }
 
 /**

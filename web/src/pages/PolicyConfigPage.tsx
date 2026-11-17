@@ -5,14 +5,14 @@
 
 import { useState, useEffect, KeyboardEvent } from 'react'
 import { Save, RefreshCw, Shield, Clock, Key, FileText, Monitor, AlertTriangle, Settings, Database } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
-import { Input } from '@/components/ui/Input'
-import { Select } from '@/components/ui/Select'
+import { Button } from '@/components/ui/button'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/option-select'
 import { Loading } from '@/components/ui/Loading'
 import { useGlobalDialog } from '@/components/ui/DialogProvider'
 import { usePolicy } from '@/hooks/usePolicy'
-import { Slider } from '@/components/ui/Slider'
+import { Slider } from '@/components/ui/slider'
 import { CircularProgress } from '@/components/ui/CircularProgress'
 import { policyService } from '@/services/policy'
 import { useNotifications } from '@/hooks/useNotifications'
@@ -213,7 +213,7 @@ const PolicyConfigPage = () => {
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="flex-1 min-w-[120px] outline-none bg-transparent"
+            className="flex-1 min-w-[120px] outline-hidden bg-transparent"
           />
         </div>
         <p className="text-xs text-gray-500">按回车添加，点击标签删除</p>
@@ -357,7 +357,7 @@ const PolicyConfigPage = () => {
       
       {/* 未保存更改提示 */}
       {hasUnsavedChanges && (
-        <Card className="border-yellow-200 bg-yellow-50">
+        <Card className="gap-0 border-yellow-200 bg-yellow-50 py-0">
           <CardContent className="p-4">
             <div className="flex items-center">
               <AlertTriangle className="w-5 h-5 text-yellow-600 mr-2" />

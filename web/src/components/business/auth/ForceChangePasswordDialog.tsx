@@ -6,8 +6,8 @@
 import React, { useState } from 'react'
 import { Eye, EyeOff, KeyRound } from 'lucide-react'
 import { Modal } from '@/components/ui/Modal'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { auth } from '@/services/core/auth.service'
 import { useNotifications } from '@/hooks/useNotifications'
 import { encryptPassword } from '@/utils/crypto'
@@ -145,7 +145,7 @@ export const ForceChangePasswordDialog: React.FC<ForceChangePasswordDialogProps>
       <form onSubmit={handleSubmit} className="p-6 space-y-5">
         {/* 提示信息 */}
         <div className="flex items-start gap-3 p-3 bg-warning/10 border border-warning/30 rounded-lg">
-          <KeyRound className="h-5 w-5 text-warning flex-shrink-0 mt-0.5" />
+          <KeyRound className="h-5 w-5 text-warning shrink-0 mt-0.5" />
           <div className="text-sm">
             <p className="font-medium text-warning">密码已过期</p>
             <p className="text-text-secondary mt-1">

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { X, Plus, Trash2, Save } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
-import { Select } from '@/components/ui/Select'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/option-select'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useNotifications } from '@/hooks/useNotifications'
 import type { DataDict, DictItem, CreateDictRequest, EntityStatus } from '@/types'
 

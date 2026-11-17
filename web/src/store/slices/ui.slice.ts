@@ -1,6 +1,10 @@
 import type { StateCreator } from 'zustand'
 import type { UISlice, GlobalStore } from '../types'
-import type { Notification } from '@/types'
+import type { Notification, UIDensity } from '@/types'
+
+/** 默认密度：由 .env 的 VITE_UI_DENSITY 决定，新项目 clone 后改这一行即可 */
+export const DEFAULT_DENSITY: UIDensity =
+  import.meta.env.VITE_UI_DENSITY === 'compact' ? 'compact' : 'comfortable'
 
 export const createUISlice: StateCreator<
   GlobalStore,
@@ -12,9 +16,13 @@ export const createUISlice: StateCreator<
   theme: 'light',
   setTheme: (theme) => set({ theme }),
 
-  // 主题：品牌色。默认墨黑。
-  brand: 'ink-black',
+  // 主题：品牌色。默认 neutral = shadcn 原版中性色
+  brand: 'neutral',
   setBrand: (brand) => set({ brand }),
+
+  // 界面密度：舒展 / 紧凑
+  density: DEFAULT_DENSITY,
+  setDensity: (density) => set({ density }),
   
   // 音效系统
   soundEnabled: true,

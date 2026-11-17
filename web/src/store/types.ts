@@ -1,4 +1,4 @@
-import type { ThemeMode, BrandTheme, User, Notification, MenuConfig, AuthErrorDialogData } from '@/types'
+import type { ThemeMode, BrandTheme, UIDensity, User, Notification, MenuConfig, AuthErrorDialogData } from '@/types'
 
 // 认证状态切片
 export interface AuthSlice {
@@ -34,6 +34,9 @@ export interface UISlice {
   /** 品牌色（换肤） */
   brand: BrandTheme
   setBrand: (brand: BrandTheme) => void
+  /** 界面密度（舒展 / 紧凑） */
+  density: UIDensity
+  setDensity: (density: UIDensity) => void
   
   // Toast 通知系统
   notifications: Notification[]
@@ -81,5 +84,6 @@ export interface PersistedState {
   ui: {
     theme: ThemeMode
     brand: BrandTheme
+    density?: UIDensity
   }
 }

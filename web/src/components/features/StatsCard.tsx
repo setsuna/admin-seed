@@ -1,5 +1,5 @@
 import { LucideIcon } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/Card'
+import { Card, CardContent } from '@/components/ui/card'
 import { cn } from '@/utils'
 
 export interface StatsCardProps {
@@ -23,7 +23,7 @@ export function StatsCard({
   className
 }: StatsCardProps) {
   return (
-    <Card className={cn('', className)}>
+    <Card className={cn('gap-0 py-0', className)}>
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div className="space-y-2">

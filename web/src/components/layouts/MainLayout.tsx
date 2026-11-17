@@ -1,15 +1,15 @@
 import { Outlet } from 'react-router-dom'
 import { AppSidebar } from './AppSidebar'
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
-import { Separator } from '@/components/ui/Separator'
-import { Button } from '@/components/ui/Button'
+import { Separator } from '@/components/ui/separator'
+import { Button } from '@/components/ui/button'
 import { ThemeSwitcher } from '@/components/ThemeSwitcher'
 import { SoundToggle } from './SoundToggle'
 import { SoundEffectManager } from './SoundEffectManager'
 import { PermissionInitializer } from './PermissionInitializer'
 import { WebSocketInitializer } from './WebSocketInitializer'
 import { IdleTimeoutManager } from './IdleTimeoutManager'
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/Popover'
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { ChangePasswordDialog } from '@/components/business/auth/ChangePasswordDialog'
 import { useStore } from '@/store'
 import { authService } from '@/services/core/auth.service'
@@ -75,7 +75,7 @@ export const MainLayout = memo(function MainLayout() {
       
       <AppSidebar />
       <SidebarInset>
-        <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-3 bg-background p-4 sm:gap-4">
+        <header className="sticky top-0 z-10 flex h-header shrink-0 items-center gap-3 border-b bg-background px-4 sm:gap-4">
           <SidebarTrigger variant="outline" className="scale-125 sm:scale-100" />
           <Separator orientation="vertical" className="h-6" />
           
@@ -161,9 +161,9 @@ export const MainLayout = memo(function MainLayout() {
           </div>
         </header>
         
-        {/* 内容区：暖灰底（bg-page），使白底卡片/表格能从背景中“浮”出来。
-            若使用 bg-background（纯白），卡片会与背景糊成一片。 */}
-        <main className="flex-1 overflow-auto bg-bg-page p-6">
+        {/* 内容区：白底（与 shadcn 一致）。侧栏是极浅灰 + 右边线，
+            卡片/表格靠 1px 边框成形，不再靠「灰底托白卡」。 */}
+        <main className="flex-1 overflow-auto bg-background p-page">
           <Outlet />
         </main>
       </SidebarInset>

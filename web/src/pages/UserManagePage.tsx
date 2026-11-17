@@ -1,16 +1,17 @@
 import { useState } from 'react'
 import { Plus, Upload, Edit, Trash2, Search, RefreshCw, Shield, Users, UserCheck, UserX, AlertTriangle, Key, ShieldCheck, ShieldAlert, Building } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { DataTable } from '@/components/features/DataTable'
+import { ListPage, type StatItem } from '@/components/features/ListPage'
+import { useColumnSettings } from '@/components/features/ColumnSettings'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/SelectNew'
+} from '@/components/ui/select'
 import { StatusIndicator } from '@/components/ui/StatusIndicator'
 import { Loading } from '@/components/ui/Loading'
 import { FormModal } from '@/components/ui/FormModal'
@@ -20,13 +21,13 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/Dialog'
+} from '@/components/ui/dialog'
 import { useGlobalDialog } from '@/components/ui/DialogProvider'
 import { BatchImportDialog } from '@/components/business/user/BatchImportDialog'
 import { useUser } from '@/hooks/useUser'
 import { useRoleOptions } from '@/hooks/useRole'
-import type { User, CreateUserRequest, UpdateUserRequest, UserSecurityLevel } from '@/types'
-import { getSecurityLevelLabel } from '@/utils'
+import type { User, CreateUserRequest, UpdateUserRequest, UserSecurityLevel, TableColumn } from '@/types'
+import { cn, getSecurityLevelLabel } from '@/utils'
 
 interface UserManagePageProps {
   mode: 'admin' | 'security' | 'security_level'
@@ -394,66 +395,76 @@ const UserManagePage: React.FC<UserManagePageProps> = ({ mode }) => {
     }
   }
   
-  // 表格列定义
-  const getColumns = () => {
-    const baseColumns = [
-      {
-        key: 'icon',
-        title: '',
-        width: 60,
-        render: (_: any, user: User) => {
-          const roleIconMap: Record<string, any> = {
-            admin: Shield,
-            meeting_admin: Users,
-            auditor: Search,
-            security_admin: Shield,
-            user: UserCheck
-          }
-          const Icon = roleIconMap[user.role] || UserCheck
-          return (
-            <div className="flex justify-center">
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                <Icon className="w-5 h-5 text-primary" />
-              </div>
-            </div>
-          )
-        }
-      },
+  // 表格列定义：单行显示，不再用「头像 + 用户名/邮箱两行」，紧凑模式下一屏能多放 2~3 倍行数
+  const roleMap: Record<string, { label: string; className: string }> = {
+    admin: { label: '管理员', className: 'bg-error/10 text-error' },
+    security_admin: { label: '安全管理员', className: 'bg-primary/10 text-primary' },
+    system_admin: { label: '系统管理员', className: 'bg-primary/10 text-primary' },
+    audit_admin: { label: '审计员', className: 'bg-warning/10 text-warning' },
+    auditor: { label: '审计员', className: 'bg-warning/10 text-warning' },
+    user: { label: '普通用户', className: 'bg-muted text-muted-foreground' },
+  }
+  const statusMap: Record<string, { label: string; type: 'success' | 'warning' | 'error' }> = {
+    active: { label: '正常', type: 'success' },
+    inactive: { label: '禁用', type: 'warning' },
+    suspended: { label: '停用', type: 'error' }
+  }
+
+  const iconBtn = 'h-control w-control p-0'
+
+  const getColumns = (): TableColumn<User>[] => {
+    const baseColumns: TableColumn<User>[] = [
       {
         key: 'username',
-        title: mode === 'security_level' ? '用户信息' : '用户名',
-        sortable: true,
-        render: (username: string, user: User) => (
-          <div>
-            <div className="font-medium">{username}</div>
-            <div className="text-sm text-text-tertiary">{user.email || '-'}</div>
-          </div>
-        )
+        title: '用户名',
+        width: 140,
+        ellipsis: true,
+        hideable: false,
+        render: (username: string) => <span className="font-medium text-foreground">{username}</span>
+      },
+      {
+        key: 'name',
+        title: '姓名',
+        width: 120,
+        ellipsis: true,
+        render: (name?: string) => name || '-'
+      },
+      {
+        key: 'email',
+        title: '邮箱',
+        width: 200,
+        ellipsis: true,
+        render: (email?: string) => <span className="text-muted-foreground">{email || '-'}</span>
       },
       {
         key: 'departmentName',
         title: '部门',
+        width: 140,
+        ellipsis: true,
         render: (departmentName?: string) => departmentName || '-'
       },
       {
         key: 'position',
         title: '职位',
+        width: 120,
+        ellipsis: true,
         render: (position?: string) => position || '-'
+      },
+      {
+        key: 'phone',
+        title: '手机号',
+        width: 130,
+        defaultHidden: true,
+        render: (phone?: string) => phone || '-'
       },
       {
         key: 'role',
         title: '角色',
+        width: 110,
         render: (role: string) => {
-          const roleMap: Record<string, { label: string; color: string }> = {
-            admin: { label: '管理员', color: 'error' },
-            meeting_admin: { label: '会议管理员', color: 'primary' },
-            auditor: { label: '审计员', color: 'warning' },
-            security_admin: { label: '安全管理员', color: 'secondary' },
-            user: { label: '普通用户', color: 'default' }
-          }
-          const roleInfo = roleMap[role] || { label: role || '未知', color: 'default' }
+          const roleInfo = roleMap[role] || { label: role || '未知', className: 'bg-muted text-muted-foreground' }
           return (
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${roleInfo.color}/10 text-${roleInfo.color}`}>
+            <span className={cn('inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium', roleInfo.className)}>
               {roleInfo.label}
             </span>
           )
@@ -464,12 +475,8 @@ const UserManagePage: React.FC<UserManagePageProps> = ({ mode }) => {
       {
         key: 'status',
         title: '状态',
+        width: 90,
         render: (status: string) => {
-          const statusMap: Record<string, { label: string; type: 'success' | 'warning' | 'error' }> = {
-            active: { label: '正常', type: 'success' },
-            inactive: { label: '禁用', type: 'warning' },
-            suspended: { label: '停用', type: 'error' }
-          }
           const statusInfo = statusMap[status] || { label: status || '未知', type: 'warning' as const }
           return <StatusIndicator status={statusInfo.type} text={statusInfo.label} />
         }
@@ -477,10 +484,12 @@ const UserManagePage: React.FC<UserManagePageProps> = ({ mode }) => {
       {
         key: mode === 'security_level' ? 'updatedAt' : 'lastLoginAt',
         title: mode === 'security_level' ? '最后更新' : '最后登录',
-        render: (timestamp?: string) => {
-          if (!timestamp) return '-'
-          return new Date(timestamp).toLocaleString()
-        }
+        width: 160,
+        render: (timestamp?: string) => (
+          <span className="tabular-nums text-muted-foreground">
+            {timestamp ? new Date(timestamp).toLocaleString() : '-'}
+          </span>
+        )
       }
     ]
     
@@ -489,26 +498,31 @@ const UserManagePage: React.FC<UserManagePageProps> = ({ mode }) => {
       baseColumns.push({
         key: 'actions',
         title: '操作',
-        width: 150,
+        width: 88,
+        hideable: false,
         render: (_: any, user: User) => (
-          <div className="flex space-x-2">
+          <div className="flex items-center gap-1">
             <Button
               variant="ghost"
               size="sm"
+              className={iconBtn}
               onClick={() => handleEditUser(user)}
               disabled={isUpdating}
               title="编辑用户"
+              aria-label="编辑用户"
             >
-              <Edit className="w-4 h-4" />
+              <Edit />
             </Button>
             <Button
               variant="ghost"
               size="sm"
+              className={cn(iconBtn, 'text-error hover:text-error')}
               onClick={() => handleDeleteUser(user)}
               disabled={isDeleting}
               title="删除用户"
+              aria-label="删除用户"
             >
-              <Trash2 className="w-4 h-4 text-error" />
+              <Trash2 />
             </Button>
           </div>
         )
@@ -517,48 +531,53 @@ const UserManagePage: React.FC<UserManagePageProps> = ({ mode }) => {
       baseColumns.push({
         key: 'actions',
         title: '安全操作',
-        width: 180,
+        width: 120,
+        hideable: false,
         render: (_: any, user: User) => (
-          <div className="flex space-x-2">
+          <div className="flex items-center gap-1">
             <Button
               variant="ghost"
               size="sm"
+              className={iconBtn}
               onClick={() => handleResetPassword(user)}
               disabled={isResettingPassword}
               title="重置密码"
             >
-              <Key className="w-4 h-4" />
+              <Key />
             </Button>
             {user.status === 'active' ? (
               <Button
                 variant="ghost"
                 size="sm"
+                className={cn(iconBtn, 'text-warning')}
                 onClick={() => handleUpdateStatus(user, 'inactive')}
                 disabled={isUpdatingStatus}
                 title="禁用用户"
               >
-                <UserX className="w-4 h-4 text-warning" />
+                <UserX />
               </Button>
             ) : (
               <Button
                 variant="ghost"
                 size="sm"
+                className={cn(iconBtn, 'text-success')}
                 onClick={() => handleUpdateStatus(user, 'active')}
                 disabled={isUpdatingStatus}
                 title="启用用户"
               >
-                <UserCheck className="w-4 h-4 text-success" />
+                <UserCheck />
               </Button>
             )}
             {user.status !== 'suspended' && (
               <Button
                 variant="ghost"
                 size="sm"
+                className={cn(iconBtn, 'text-error')}
                 onClick={() => handleUpdateStatus(user, 'suspended')}
                 disabled={isUpdatingStatus}
                 title="停用用户"
               >
-                <AlertTriangle className="w-4 h-4 text-error" />
+                <AlertTriangle />
               </Button>
             )}
           </div>
@@ -568,25 +587,28 @@ const UserManagePage: React.FC<UserManagePageProps> = ({ mode }) => {
       baseColumns.push({
         key: 'actions',
         title: '操作',
-        width: 120,
+        width: 80,
+        hideable: false,
         render: (_: any, user: User) => (
-          <div className="flex space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleUpdateSecurityLevel(user)}
-              disabled={isUpdatingSecurityLevel}
-              title="调整密级"
-            >
-              <Key className="w-4 h-4" />
-            </Button>
-          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={iconBtn}
+            onClick={() => handleUpdateSecurityLevel(user)}
+            disabled={isUpdatingSecurityLevel}
+            title="调整密级"
+          >
+            <Key />
+          </Button>
         )
       })
     }
     
     return baseColumns
   }
+
+  const columns = getColumns()
+  const { columnVisibility, columnSettings } = useColumnSettings(`users-${mode}`, columns)
   
   // 表单字段定义
   const formFields = [
@@ -661,338 +683,170 @@ const UserManagePage: React.FC<UserManagePageProps> = ({ mode }) => {
     }
   ]
   
-  // 统计卡片配置
-  const getStatsCards = () => {
-    if (!userStats) return null
-    
-    if (mode === 'security_level') {
-      return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <Users className="w-6 h-6 text-primary" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-text-tertiary">总用户数</p>
-                  <p className="text-2xl font-bold text-text-primary">{userStats.total}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-success/10 rounded-lg">
-                  <Shield className="w-6 h-6 text-success" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-text-tertiary">内部级别</p>
-                  <p className="text-2xl font-bold text-text-primary">{userStats.bySecurityLevel?.internal || 0}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-warning/10 rounded-lg">
-                  <ShieldAlert className="w-6 h-6 text-warning" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-text-tertiary">秘密级别</p>
-                  <p className="text-2xl font-bold text-text-primary">{userStats.bySecurityLevel?.confidential || 0}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-error/10 rounded-lg">
-                  <ShieldCheck className="w-6 h-6 text-error" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-text-tertiary">机密级别</p>
-                  <p className="text-2xl font-bold text-text-primary">{userStats.bySecurityLevel?.secret || 0}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )
-    }
-    
-    // admin 和 security 模式的统计卡片
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-primary/10 rounded-lg">
-                <Users className="w-6 h-6 text-primary" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-text-tertiary">总用户数</p>
-                <p className="text-2xl font-bold text-text-primary">{userStats.total}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-success/10 rounded-lg">
-                <UserCheck className="w-6 h-6 text-success" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-text-tertiary">正常用户</p>
-                <p className="text-2xl font-bold text-text-primary">{userStats.active}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-warning/10 rounded-lg">
-                <UserX className="w-6 h-6 text-warning" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-text-tertiary">禁用用户</p>
-                <p className="text-2xl font-bold text-text-primary">{userStats.inactive}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center">
-              <div className="p-2 bg-error/10 rounded-lg">
-                <AlertTriangle className="w-6 h-6 text-error" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-text-tertiary">停用用户</p>
-                <p className="text-2xl font-bold text-text-primary">{userStats.suspended}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
+  // 统计：舒展模式是卡片，紧凑模式自动收成工具栏里的一行摘要（由 ListPage 决定）
+  const stats: StatItem[] = !userStats ? [] : mode === 'security_level'
+    ? [
+        { key: 'total', label: '总用户数', value: userStats.total, icon: Users, tone: 'primary' },
+        { key: 'internal', label: '内部级别', value: userStats.bySecurityLevel?.internal || 0, icon: Shield, tone: 'success' },
+        { key: 'confidential', label: '秘密级别', value: userStats.bySecurityLevel?.confidential || 0, icon: ShieldAlert, tone: 'warning' },
+        { key: 'secret', label: '机密级别', value: userStats.bySecurityLevel?.secret || 0, icon: ShieldCheck, tone: 'error' },
+      ]
+    : [
+        { key: 'total', label: '总用户', value: userStats.total, icon: Users, tone: 'primary' },
+        { key: 'active', label: '正常', value: userStats.active, icon: UserCheck, tone: 'success' },
+        { key: 'inactive', label: '禁用', value: userStats.inactive, icon: UserX, tone: 'warning' },
+        { key: 'suspended', label: '停用', value: userStats.suspended, icon: AlertTriangle, tone: 'error' },
+      ]
+
+  // 批量操作（选中后出现在表格上方的操作条里）
+  const batchBtn = 'h-control px-2.5 text-table'
+  const batchActions = (
+    <>
+      {pageConfig.showDeleteButton && (
+        <>
+          <Button variant="outline" size="sm" className={batchBtn} onClick={handleBatchUpdateDepartment} disabled={isBatchUpdatingDepartment}>
+            <Building />
+            调整部门
+          </Button>
+          <Button variant="outline" size="sm" className={cn(batchBtn, 'text-error hover:text-error')} onClick={handleBatchDelete} disabled={isBatchDeleting}>
+            <Trash2 />
+            删除
+          </Button>
+        </>
+      )}
+      {pageConfig.showSecurityOperations && (
+        <>
+          <Button variant="outline" size="sm" className={batchBtn} onClick={handleBatchResetPassword} disabled={isResettingPassword}>
+            <Key />
+            重置密码
+          </Button>
+          <Button variant="outline" size="sm" className={batchBtn} onClick={() => handleBatchUpdateStatus('active')} disabled={isUpdatingStatus}>
+            <UserCheck />
+            启用
+          </Button>
+          <Button variant="outline" size="sm" className={batchBtn} onClick={() => handleBatchUpdateStatus('inactive')} disabled={isUpdatingStatus}>
+            <UserX />
+            禁用
+          </Button>
+          <Button variant="outline" size="sm" className={cn(batchBtn, 'text-error hover:text-error')} onClick={() => handleBatchUpdateStatus('suspended')} disabled={isUpdatingStatus}>
+            <AlertTriangle />
+            停用
+          </Button>
+        </>
+      )}
+      {pageConfig.showSecurityLevelOperations && (
+        <Button variant="outline" size="sm" className={batchBtn} onClick={handleBatchUpdateSecurityLevel} disabled={isBatchUpdatingSecurityLevel}>
+          <Shield />
+          调整密级
+        </Button>
+      )}
+    </>
+  )
   
   if (isLoading && !users.length) {
     return <Loading />
   }
   
   return (
-    <div className="space-y-6">
-      {/* 统计卡片 */}
-      {getStatsCards()}
-      
-      {/* 筛选和搜索区域 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{pageConfig.title}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
-            <div className="flex-1">
-              <div className="flex space-x-2">
-                <Input
-                  placeholder="搜索用户名、邮箱、部门、职位..."
-                  value={searchKeyword}
-                  onChange={(e) => setSearchKeyword(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                  className="flex-1"
-                />
-                <Button onClick={handleSearch} disabled={isLoading}>
-                  <Search className="w-4 h-4" />
-                </Button>
-              </div>
+    <>
+      <ListPage
+        actions={pageConfig.showCreateButton && (
+          <>
+            <Button variant="outline" size="sm" className="h-control" onClick={() => setIsBatchImportOpen(true)}>
+              <Upload />
+              批量导入
+            </Button>
+            <Button size="sm" className="h-control" onClick={handleCreateUser} disabled={isCreating}>
+              <Plus />
+              新增用户
+            </Button>
+          </>
+        )}
+        stats={stats}
+        filters={
+          <>
+            <div className="relative w-full sm:w-64">
+              <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="搜索用户名、邮箱、部门、职位"
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                className="h-control pl-8 text-table md:text-table"
+              />
             </div>
-            
-            <div className="flex space-x-2">
-              <Select
-                value={filters.department || undefined}
-                onValueChange={(value) => {
-                  setFilters({ ...filters, department: value || '' })
-                  setPagination({ page: 1, pageSize: pagination?.pageSize || 20 })
-                }}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="全部部门" />
-                </SelectTrigger>
-                <SelectContent>
-                  {departmentOptions.map(dept => (
-                    <SelectItem key={dept.id} value={dept.id}>{dept.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              <Select
-                value={filters.status || undefined}
-                onValueChange={(value) => {
-                  setFilters({ ...filters, status: (value || '') as any })
-                  setPagination({ page: 1, pageSize: pagination?.pageSize || 20 })
-                }}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="全部状态" />
-                </SelectTrigger>
-                <SelectContent>
-                  {statusOptions.map(status => (
-                    <SelectItem key={status.value} value={status.value}>{status.label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              
-              <Button
-                variant="outline"
-                onClick={resetFilters}
-                disabled={isLoading}
-              >
-                重置
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={refreshData}
-                disabled={isLoading}
-              >
-                <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      {/* 操作按钮区域 */}
-      <div className="flex justify-between items-center">
-        <div className="flex space-x-2">
-          {/* Admin 模式操作 */}
-          {pageConfig.showCreateButton && (
-            <>
-              <Button onClick={handleCreateUser} disabled={isCreating}>
-                <Plus className="w-4 h-4" />
-                新增用户
-              </Button>
-              <Button variant="outline" onClick={() => setIsBatchImportOpen(true)}>
-                <Upload className="w-4 h-4" />
-                批量导入
-              </Button>
-            </>
-          )}
-          
-          {selectedIds.length > 0 && (
-            <>
-              {/* Admin 模式批量操作 */}
-              {pageConfig.showDeleteButton && (
-                <>
-                  <Button
-                    variant="outline"
-                    onClick={handleBatchUpdateDepartment}
-                    disabled={isBatchUpdatingDepartment}
-                  >
-                    <Building className="w-4 h-4" />
-                    批量调整部门 ({selectedIds.length})
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    onClick={handleBatchDelete}
-                    disabled={isBatchDeleting}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    批量删除 ({selectedIds.length})
-                  </Button>
-                </>
-              )}
-              
-              {/* Security 模式批量操作 */}
-              {pageConfig.showSecurityOperations && (
-                <>
-                  <Button
-                    variant="outline"
-                    onClick={handleBatchResetPassword}
-                    disabled={isResettingPassword}
-                  >
-                    <Key className="w-4 h-4" />
-                    批量重置密码 ({selectedIds.length})
-                  </Button>
-                  
-                  <Button
-                    variant="outline"
-                    onClick={() => handleBatchUpdateStatus('active')}
-                    disabled={isUpdatingStatus}
-                  >
-                    <UserCheck className="w-4 h-4" />
-                    批量启用 ({selectedIds.length})
-                  </Button>
-                  
-                  <Button
-                    variant="outline"
-                    onClick={() => handleBatchUpdateStatus('inactive')}
-                    disabled={isUpdatingStatus}
-                  >
-                    <UserX className="w-4 h-4" />
-                    批量禁用 ({selectedIds.length})
-                  </Button>
-                  
-                  <Button
-                    variant="destructive"
-                    onClick={() => handleBatchUpdateStatus('suspended')}
-                    disabled={isUpdatingStatus}
-                  >
-                    <AlertTriangle className="w-4 h-4" />
-                    批量停用 ({selectedIds.length})
-                  </Button>
-                </>
-              )}
-              
-              {/* Security Level 模式批量操作 */}
-              {pageConfig.showSecurityLevelOperations && (
-                <Button
-                  variant="outline"
-                  onClick={handleBatchUpdateSecurityLevel}
-                  disabled={isBatchUpdatingSecurityLevel}
-                >
-                  <Shield className="w-4 h-4" />
-                  批量调整密级 ({selectedIds.length})
-                </Button>
-              )}
-            </>
-          )}
-        </div>
-        
-        <div className="text-sm text-text-tertiary">
-          共 {pagination?.total || 0} 条记录
-        </div>
-      </div>
-      
-      {/* 用户表格 */}
-      <Card>
-        <CardContent className="p-0">
-          <DataTable
-            data={users}
-            columns={getColumns()}
-            loading={isLoading}
-            pagination={pagination}
-            onPaginationChange={setPagination}
-            rowKey="id"
-            selectable
-            selectedRowKeys={selectedIds}
-            onSelectionChange={setSelectedIds}
-          />
-        </CardContent>
-      </Card>
+            <Select
+              value={filters.department || undefined}
+              onValueChange={(value) => {
+                setFilters({ ...filters, department: value || '' })
+                setPagination({ page: 1, pageSize: pagination?.pageSize || 20 })
+              }}
+            >
+              <SelectTrigger className="h-control w-[140px] py-0 text-table">
+                <SelectValue placeholder="全部部门" />
+              </SelectTrigger>
+              <SelectContent>
+                {departmentOptions.map(dept => (
+                  <SelectItem key={dept.id} value={dept.id}>{dept.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select
+              value={filters.status || undefined}
+              onValueChange={(value) => {
+                setFilters({ ...filters, status: (value || '') as any })
+                setPagination({ page: 1, pageSize: pagination?.pageSize || 20 })
+              }}
+            >
+              <SelectTrigger className="h-control w-[110px] py-0 text-table">
+                <SelectValue placeholder="全部状态" />
+              </SelectTrigger>
+              <SelectContent>
+                {statusOptions.map(status => (
+                  <SelectItem key={status.value} value={status.value}>{status.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button variant="ghost" size="sm" className="h-control px-2.5 text-table" onClick={() => { setSearchKeyword(''); resetFilters() }} disabled={isLoading}>
+              重置
+            </Button>
+          </>
+        }
+        toolbarRight={
+          <>
+            {columnSettings}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-control w-control p-0 text-muted-foreground"
+              onClick={refreshData}
+              disabled={isLoading}
+              title="刷新"
+              aria-label="刷新"
+            >
+              <RefreshCw className={isLoading ? 'animate-spin' : ''} />
+            </Button>
+          </>
+        }
+        selection={{
+          count: selectedIds.length,
+          onClear: () => setSelectedIds([]),
+          actions: batchActions,
+        }}
+      >
+        <DataTable
+          data={users}
+          columns={columns}
+          columnVisibility={columnVisibility}
+          loading={isLoading}
+          pagination={pagination}
+          onPaginationChange={setPagination}
+          rowKey="id"
+          selectable
+          selectedRowKeys={selectedIds}
+          onSelectionChange={setSelectedIds}
+        />
+      </ListPage>
       
       {/* Admin 模式表单弹窗 */}
       {pageConfig.showCreateButton && (
@@ -1176,7 +1030,7 @@ const UserManagePage: React.FC<UserManagePageProps> = ({ mode }) => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   )
 }
 

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Modal } from './Modal'
-import { Button } from './Button'
-import { Select } from './Select'
+import { Button } from './button'
+import { Select } from './option-select'
 
 export interface FormModalProps {
   isOpen?: boolean
@@ -84,7 +84,7 @@ export const FormModal: React.FC<FormModalProps> = ({
     const { name, label, type, required, placeholder, options, colSpan } = field
     // 双列模式下，字段默认占半行；标记 colSpan=2 的占整行（如长输入、textarea）
     const spanClass = columns === 2 && colSpan === 2 ? 'sm:col-span-2' : ''
-    const inputClass = 'w-full h-10 px-3 bg-background border border-input rounded-md text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-ring transition-colors'
+    const inputClass = 'w-full h-10 px-3 bg-background border border-input rounded-md text-sm text-text-primary placeholder:text-text-tertiary focus:outline-hidden focus:ring-2 focus:ring-ring/60 focus:border-ring transition-colors'
     
     switch (type) {
       case 'text':
@@ -117,7 +117,7 @@ export const FormModal: React.FC<FormModalProps> = ({
               placeholder={placeholder}
               required={required}
               rows={3}
-              className="w-full px-3 py-2 bg-background border border-input rounded-md text-sm text-text-primary placeholder:text-text-tertiary focus:outline-none focus:ring-2 focus:ring-ring/60 focus:border-ring transition-colors resize-none"
+              className="w-full px-3 py-2 bg-background border border-input rounded-md text-sm text-text-primary placeholder:text-text-tertiary focus:outline-hidden focus:ring-2 focus:ring-ring/60 focus:border-ring transition-colors resize-none"
             />
           </div>
         )

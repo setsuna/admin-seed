@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import { X, AlertTriangle, Info, CheckCircle, AlertCircle } from 'lucide-react'
 import { cn } from '@/utils'
-import { Button } from './Button'
+import { Button } from './button'
 
 export interface ModalProps {
   isOpen: boolean
@@ -67,7 +67,7 @@ export const Modal: React.FC<ModalProps> = ({
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs"
       onClick={handleOverlayClick}
     >
       <div
@@ -166,7 +166,7 @@ export const AlertModal: React.FC<AlertModalProps> = ({
     >
       <div className="p-6">
         <div className="flex items-start gap-4">
-          <div className={cn('flex-shrink-0 mt-1', iconColors[type])}>
+          <div className={cn('shrink-0 mt-1', iconColors[type])}>
             <Icon className="h-6 w-6" />
           </div>
           <div className="flex-1 min-w-0">

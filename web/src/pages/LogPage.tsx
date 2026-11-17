@@ -12,9 +12,9 @@ import {
   AlertCircle,
   Shield
 } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
-import { Card, CardContent } from '@/components/ui/Card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent } from '@/components/ui/card'
 import { DataTable } from '@/components/features/DataTable'
 import {
   Select,
@@ -22,7 +22,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/SelectNew'
+} from '@/components/ui/select'
 import { logService } from '@/services'
 import { formatDateTime } from '@/utils'
 import {
@@ -30,7 +30,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/Tooltip'
+} from '@/components/ui/tooltip'
 import { PageActions } from '@/components/layouts/PageActions'
 import type { 
   ApplicationLog,
@@ -375,7 +375,7 @@ const LogPage: React.FC<LogPageProps> = ({ mode }) => {
 
       {/* 筛选区域 */}
       <Card>
-        <CardContent className="pt-6">
+        <CardContent>
           {/* 基础搜索栏 */}
           <div className="flex items-center gap-4 mb-4">
             <div className="flex-1 relative">
@@ -566,7 +566,7 @@ const LogPage: React.FC<LogPageProps> = ({ mode }) => {
       </Card>
 
       {/* 日志表格 */}
-      <Card>
+      <Card className="gap-0 overflow-hidden py-0">
         <CardContent className="p-0">
           <DataTable
             data={logs}

@@ -8,7 +8,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from './AlertDialog'
+} from './alert-dialog'
 import { UseDialogReturn } from '@/hooks/useModal'
 import { AlertTriangle, Info, AlertCircle } from 'lucide-react'
 import { cn } from '@/utils'
@@ -54,7 +54,7 @@ export const DialogComponents: React.FC<DialogComponentsProps> = ({ dialog }) =>
           <AlertDialogHeader>
             <div className="flex items-start gap-4">
               {alertState.options?.type && (
-                <div className="flex-shrink-0 mt-1">
+                <div className="shrink-0 mt-1">
                   {getIcon(alertState.options.type as 'warning' | 'danger' | 'info')}
                 </div>
               )}
@@ -82,7 +82,7 @@ export const DialogComponents: React.FC<DialogComponentsProps> = ({ dialog }) =>
           <AlertDialogHeader>
             <div className="flex items-start gap-4">
               {confirmState.options?.type && (
-                <div className="flex-shrink-0 mt-1">
+                <div className="shrink-0 mt-1">
                   {getIcon(confirmState.options.type)}
                 </div>
               )}

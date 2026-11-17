@@ -6,14 +6,15 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { permissionApi } from '@/services/permission'
-import { Card } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
+import { Card } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 import { Loading } from '@/components/ui/Loading'
 import { FormModal } from '@/components/ui/FormModal'
-import { Input, Textarea } from '@/components/ui/Input'
-import { Select } from '@/components/ui/Select'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Select } from '@/components/ui/option-select'
 import { DialogComponents } from '@/components/ui/DialogComponents'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useDialog } from '@/hooks/useModal'
 import { useNotifications } from '@/hooks/useNotifications'
 import {
@@ -526,15 +527,15 @@ function RoleCardGrid({ roles, totalPermissions, rolePermissionCounts, onEdit, o
         return (
           <Card
             key={role.id}
-            className={`group relative p-4 transition-shadow ${disabled ? 'opacity-60' : 'hover:shadow-md'}`}
+            className={`group relative gap-0 p-4 transition-shadow ${disabled ? 'opacity-60' : 'hover:shadow-md'}`}
           >
             <div className="absolute top-0 left-0 right-0 h-1 rounded-t-lg" style={{ backgroundColor: color }} />
             <div className="pt-2">
               <div className="flex items-center gap-2 mb-1">
-                <Shield className="w-4 h-4 flex-shrink-0" style={{ color }} />
+                <Shield className="w-4 h-4 shrink-0" style={{ color }} />
                 <span className="font-semibold text-sm truncate">{role.name}</span>
                 {role.isBuiltIn && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground flex-shrink-0">内置</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground shrink-0">内置</span>
                 )}
               </div>
               <p className="text-xs text-muted-foreground font-mono mb-1">{role.code}</p>

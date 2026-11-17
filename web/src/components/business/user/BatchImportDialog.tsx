@@ -12,16 +12,16 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/Dialog'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/SelectNew'
+} from '@/components/ui/select'
 import { useRoleOptions } from '@/hooks/useRole'
 
 // 需要过滤掉的管理角色

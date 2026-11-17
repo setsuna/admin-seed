@@ -8,7 +8,7 @@
 ```
 admin-seed/
 ├── api/    Go 1.21+ / Gin / Squirrel / JWT / SQLite·MySQL
-└── web/    React 18 / TypeScript / Vite / TailwindCSS / TanStack Query / Zustand
+└── web/    React 19 / TypeScript / Vite / Tailwind CSS 4 / shadcn/ui / TanStack Query·Table / Zustand
 ```
 
 ## 快速开始
@@ -55,7 +55,7 @@ Go 服务会把 `./static` 作为 SPA 根目录并处理前端路由 fallback。
 
 | 层 | 内容 |
 |---|---|
-| UI | 32 个基础组件（Button/Card/Modal/Table/Select/Tabs/Sheet/Popover/Tooltip…） |
+| UI | shadcn/ui 官方组件（new-york，neutral）+ 少量项目组件（Modal/FormModal/Notification/Loading…） |
 | 布局 | 侧边栏、主布局、权限初始化、空闲超时锁定、WebSocket 初始化、主题切换 |
 | 数据 | 统一 httpClient（自动解包 data、401 跳登录、错误码分类）、TanStack Query、Zustand 切片（auth/ui/app） |
 | 页面 | 登录、仪表板、用户管理、部门管理、数据字典、安全策略、角色权限、操作日志 |
@@ -119,20 +119,61 @@ Go 服务会把 `./static` 作为 SPA 根目录并处理前端路由 fallback。
 
 ## 视觉规范
 
-后台的层级靠**背景灰度**建立，不靠阴影：
+**直接用 shadcn/ui 原版**（style `new-york`，base color `neutral`，Tailwind CSS 4），布局照它的 dashboard-01：
+侧栏极浅灰、内容区纯白、靠 1px 边线分区；卡片 `rounded-xl` + 细边框 + `shadow-xs`。
 
-| 层 | token | 值 | 说明 |
-|---|---|---|---|
-| 页面底 | `--bg-page` | `#F5F5F5` | 内容区最外层，用 `bg-bg-page` |
-| 卡片 / 表格 | `--card` | `#FFFFFF` | 白底，1px 边框 |
-| 边框 | `--border` | `#E8E8E8` | 卡片与分隔线 |
+### shadcn 组件怎么加、怎么升级
 
-两条硬规则：
+```bash
+cd web
+npx shadcn@latest add dropdown-menu        # 新加组件，写到 src/components/ui/
+npx shadcn@latest add button --overwrite   # 用官方最新版覆盖
+```
 
-1. **页面底与卡片必须拉开 ≥4% 灰度。** 原值是 `#FAFAFA`（只差 2%），
-   在表格页会和白色表格糊成一片，看着像"脏白"而不像刻意的灰。
-2. **不要用纯白当页面底。** shadcn 的 `--background` 必须保持纯白（大量组件默认透出它），
-   页面外层一律用 `bg-bg-page`。纯白底 + 白卡片时，卡片边界、分页条、表头全部失去容器感。
+- 配置在 `web/components.json`；工具函数入口是 `src/lib/utils.ts`（转出 `@/utils/common` 的 `cn`）。
+- **文件命名**：shadcn 组件用它的小写名（`button.tsx`、`select.tsx`），项目自己的组件用大驼峰
+  （`Modal.tsx`、`Notification.tsx`），一眼能分出哪些可以被 CLI 覆盖。
+- 有两处在官方源码上加了参数，`--overwrite` 后要补回（文件里有注释标记）：
+  `button.tsx` 的 `loading`、`input.tsx` 的 `error`。
+- 原来的「options 数组」简易下拉改名为 `option-select.tsx`（导出名仍是 `Select`），完整 Radix 版是 `select.tsx`。
+- shadcn 的 `Card` 自带 `py-6 gap-6`。内容自己带内边距的卡片（比如整张表格）要写成
+  `<Card className="gap-0 py-0 overflow-hidden">`，否则上下会多出一截空白。
+
+### 主题 token
+
+变量在 `src/styles/globals.css`，Tailwind 映射在 `src/index.css` 的 `@theme inline`。三个维度互不影响：
+
+| 维度 | 挂在 `<html>` 上 | 说明 |
+|---|---|---|
+| 明暗 | `class="dark"` | shadcn 原版浅色 / 深色变量（oklch） |
+| 品牌色 | `data-brand="neutral"` | 默认 `neutral` = 纯 shadcn；另有 10 套品牌色，只覆盖 primary / ring / 侧栏选中 |
+| 密度 | `data-density="comfortable"` | 见下节 |
+
+shadcn 的变量名和值保持原样，项目自己的变量（`--success` / `--warning` / `--text-*` / `--bg-*` 等）
+另起名字放在后面，**不要改 shadcn 原版变量的值**，否则以后 `shadcn add` 进来的组件会对不上。
+
+规则：
+
+1. **侧栏顶部与顶栏同高、同一条底边线**（都用 `h-header`），左右两条横线必须对齐。
+2. **不要给内容区铺灰底**。`--bg-page` 只给登录页这类没有侧栏的整页用。
+
+### 界面密度（两套风格）
+
+第三个主题维度，与明暗、品牌色正交：`<html data-density="comfortable | compact">`。
+
+| | 舒展卡片风 comfortable | 紧凑数据风 compact |
+|---|---|---|
+| 适合 | 数据量小、偏展示的后台 | 大量列表查看与批量操作 |
+| 顶栏 / 行高 / 字号 | 56px / 48px / 14px（shadcn 默认尺寸） | 48px / 36px / 13px |
+| 列表页 | 统计卡片 → 筛选卡 → 表格卡 | 一张卡撑满视口：一行工具栏 + 表格（表头吸顶、分页钉底） |
+
+- 默认值：`web/.env.*` 里的 `VITE_UI_DENSITY`（新项目 clone 后改这一行）。
+- 用户可在右上角主题面板切换，选择记在浏览器 localStorage。
+- 尺寸 token 在 `src/styles/globals.css` 的 `[data-density]` 块，对应工具类 `h-header` / `h-control` / `h-row` /
+  `p-page` / `px-cell` / `gap-section` / `text-table`（映射见 `src/index.css` 的 `@theme inline`）。
+  **页面里不要写死 `h-10`、`p-6` 这类尺寸**，否则切换密度时会对不上。
+- 列表页用 `components/features/ListPage` + `DataTable`（TanStack Table）+ `useColumnSettings`，
+  页面只声明有哪几块，怎么摆由密度决定。参考 `pages/UserManagePage.tsx`。
 
 ### 页面头部与操作按钮
 
@@ -180,8 +221,6 @@ logo 是内联 SVG（`components/ui/Logo.tsx` 的 `<Mark>`），用 `currentColo
 深浅背景都能自适应。换成自己的品牌时只需替换该 SVG 的内容，
 调用方（侧边栏、登录页）无需改动。favicon 在 `public/favicon.svg`。
 
-卡片默认**只有边框、没有常驻阴影**——浅色系里阴影几乎不可见，反而让边缘发糊。
-需要"浮起"效果时用 `<Card variant="lift">`，hover 才加阴影。
 
 ## 授权 / License（种子不含，需要时移植）
 

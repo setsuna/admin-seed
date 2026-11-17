@@ -12,11 +12,11 @@ import {
   PowerOff,
   X
 } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
-import { Select } from '@/components/ui/Select'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Select } from '@/components/ui/option-select'
 import { DataTable } from '@/components/features/DataTable'
-import { Card, CardContent } from '@/components/ui/Card'
+import { Card, CardContent } from '@/components/ui/card'
 import DictEditModal from '@/components/features/DictEditModal'
 import { useGlobalDialog } from '@/components/ui/DialogProvider'
 import { useDict } from '@/hooks/useDict'
@@ -501,7 +501,7 @@ const DataDictionaryPage: React.FC = () => {
                 加载详情中...
               </div>
             ) : expandedDictDetails ? (
-              <Card className="m-4 border-0 shadow-none">
+              <Card className="m-4 gap-0 border-0 py-0 shadow-none">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-semibold flex items-center gap-2">

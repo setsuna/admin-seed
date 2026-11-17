@@ -1,5 +1,18 @@
 import { clsx, type ClassValue } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import { extendTailwindMerge } from 'tailwind-merge'
+
+/**
+ * 让 tailwind-merge 认识界面密度的自定义工具类（见 index.css 的 @theme inline）。
+ * 不登记的话 cn('h-10', 'h-control') 会两个都保留，最终谁生效取决于 CSS 顺序。
+ */
+const twMerge = extendTailwindMerge({
+  extend: {
+    theme: {
+      spacing: ['header', 'control', 'row', 'table-head', 'page', 'section', 'cell'],
+      text: ['table'],
+    },
+  },
+})
 
 /**
  * 合并CSS类名的工具函数

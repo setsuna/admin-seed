@@ -1,0 +1,72 @@
+@utility no-scrollbar {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+@utility faded-bottom {
+  @apply after:pointer-events-none after:absolute after:bottom-0 after:left-0 after:hidden after:h-32 after:w-full after:bg-[linear-gradient(180deg,transparent_10%,var(--background)_70%)] md:after:block;
+}
+
+@utility status-online {
+  /* Allotment 自定义样式 */
+
+  /* 分割线样式优化 */
+
+  /* 状态指示器 */
+  @apply inline-flex h-2 w-2 rounded-full bg-success;
+}
+
+@utility status-offline {
+  @apply inline-flex h-2 w-2 rounded-full bg-muted-foreground;
+}
+
+@utility status-warning {
+  @apply inline-flex h-2 w-2 rounded-full bg-warning;
+}
+
+@utility status-error {
+  @apply inline-flex h-2 w-2 rounded-full bg-error;
+}
+
+@utility card {
+  /* 卡片样式 */
+  @apply rounded-lg border bg-card text-card-foreground shadow-xs;
+}
+
+@utility data-table {
+  /* 数据表格样式 */
+  @apply w-full border-collapse border-spacing-0;
+
+  & th {
+    @apply border-b px-4 py-2 text-left font-medium text-muted-foreground;
+  }
+
+  & td {
+    @apply border-b px-4 py-2;
+  }
+}
+
+@utility scrollbar-thin {
+  /* 滚动条样式 */
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    @apply bg-muted;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    @apply bg-muted-foreground/50;
+  }
+}

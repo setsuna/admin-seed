@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { Building2, CheckCircle, XCircle, BarChart } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/Card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Loading } from '@/components/ui/Loading'
 import { departmentService } from '@/services'
 
@@ -26,7 +26,7 @@ export const DepartmentStats: React.FC<DepartmentStatsProps> = ({ className }) =
     return (
       <div className={className}>
         <Card>
-          <CardContent className="pt-6">
+          <CardContent>
             <div className="text-center text-destructive">
               加载统计数据失败
             </div>
@@ -76,7 +76,7 @@ export const DepartmentStats: React.FC<DepartmentStatsProps> = ({ className }) =
       {statItems.map((item, index) => {
         const Icon = item.icon
         return (
-          <Card key={index} className="hover:shadow-md transition-shadow">
+          <Card key={index} className="gap-0 py-0 transition-shadow hover:shadow-md">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>

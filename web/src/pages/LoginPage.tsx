@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Eye, EyeOff, AlertTriangle, CloudOff, ShieldCheck, History, PanelLeft, Square, User, Lock } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
-import { Input } from '@/components/ui/Input'
-import { Card, CardContent } from '@/components/ui/Card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent } from '@/components/ui/card'
 import { Logo, Mark } from '@/components/ui/Logo'
 import { useAuth } from '@/store'
 import { auth } from '@/services/core/auth.service'
@@ -12,7 +12,7 @@ import { useNotifications } from '@/hooks/useNotifications'
 import { encryptPassword } from '@/utils/crypto'
 import { ForceChangePasswordDialog } from '@/components/business/auth/ForceChangePasswordDialog'
 import { policyService } from '@/services/policy'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/Dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { ThemeSwitcher } from '@/components/ThemeSwitcher'
 import { useUI } from '@/store'
 import { APP_MAJOR_VERSION, APP_VERSION_FULL, COMPANY_NAME } from '@/utils/version'
@@ -318,14 +318,14 @@ const LoginPage = () => {
   const renderLayoutToggle = () => (
     <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
       {/* 主题切换：明暗模式 + 10 套品牌色 */}
-      <ThemeSwitcher className="h-9 w-9 rounded-md border border-border/60 bg-card/80 backdrop-blur-sm hover:bg-card hover:shadow-md" />
+      <ThemeSwitcher className="h-9 w-9 rounded-md border border-border/60 bg-card/80 backdrop-blur-xs hover:bg-card hover:shadow-md" />
 
       {/* 布局切换 */}
       <button
         type="button"
         onClick={toggleLayout}
         title={layout === 'split' ? '切换为居中布局' : '切换为分栏布局'}
-        className="flex h-9 w-9 items-center justify-center rounded-md border border-border/60 bg-card/80 text-text-tertiary backdrop-blur-sm transition-all duration-200 hover:bg-card hover:text-text-secondary hover:shadow-md"
+        className="flex h-9 w-9 items-center justify-center rounded-md border border-border/60 bg-card/80 text-text-tertiary backdrop-blur-xs transition-all duration-200 hover:bg-card hover:text-text-secondary hover:shadow-md"
       >
         {/* 图标表示“切换后会变成什么布局”：
             当前 split → 显示 Square（居中卡片）；当前 centered → 显示 PanelLeft（分栏）。
@@ -432,7 +432,7 @@ const LoginPage = () => {
             禁用态下去掉渐变，避免“亮色但不可点”的迷惑感 */}
         <Button
           type="submit"
-          className="w-full h-11 text-base font-medium transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 motion-reduce:transform-none bg-gradient-to-br from-primary to-primary-active hover:from-primary-hover hover:to-primary-active disabled:bg-none disabled:bg-primary-disabled"
+          className="w-full h-11 text-base font-medium transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 motion-reduce:transform-none bg-linear-to-br from-primary to-primary-active hover:from-primary-hover hover:to-primary-active disabled:bg-none disabled:bg-primary-disabled"
           loading={loading}
           disabled={loading}
         >
@@ -496,7 +496,7 @@ const LoginPage = () => {
           
           {/* 登录卡片 */}
           <Card
-            className="shadow-2xl border-border/50 backdrop-blur-sm bg-card/95 animate-fade-up motion-reduce:animate-none"
+            className="gap-0 py-0 shadow-2xl border-border/50 backdrop-blur-xs bg-card/95 animate-fade-up motion-reduce:animate-none"
             style={{ animationDelay: '80ms' }}
           >
             <CardContent className="px-8 py-8">
@@ -519,7 +519,7 @@ const LoginPage = () => {
       {/* 左侧品牌区（小屏隐藏，降级为居中表单） */}
       <div className="relative hidden lg:flex lg:w-[46%] flex-col justify-between overflow-hidden bg-primary p-10 xl:p-14 text-primary-foreground">
         {/* 深度渐变叠层（主题无关，政务红/暗色主题自动适配） */}
-        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-black/10 to-black/40 pointer-events-none" />
+        <div className="absolute inset-0 bg-linear-to-br from-transparent via-black/10 to-black/40 pointer-events-none" />
         
         {/* 点阵纹理 */}
         <div

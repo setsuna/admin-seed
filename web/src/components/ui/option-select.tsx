@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from './SelectNew'
+} from './select'
 
 export interface SelectOption {
   value: string | number

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ChevronRight, ChevronDown, Building2, Users, Edit, Trash2, Plus } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { StatusIndicator } from '@/components/ui/StatusIndicator'
 import { Loading } from '@/components/ui/Loading'
 import type { Department } from '@/types'
@@ -95,7 +95,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({
         onMouseLeave={() => setShowActions(false)}
       >
         {/* 展开/收起按钮 */}
-        <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
+        <div className="w-6 h-6 flex items-center justify-center shrink-0">
           {hasChildren ? (
             <Button
               variant="ghost"
@@ -115,7 +115,7 @@ const TreeNode: React.FC<TreeNodeProps> = ({
         </div>
         
         {/* 部门图标 */}
-        <div className="flex-shrink-0 mr-3">
+        <div className="shrink-0 mr-3">
           <div className="w-8 h-8 rounded-md bg-primary/10 flex items-center justify-center">
             <Building2 className="h-4 w-4 text-primary" />
           </div>
@@ -355,7 +355,7 @@ export const DepartmentTree: React.FC<DepartmentTreeProps> = ({
               placeholder="搜索部门..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-3 pr-8 py-1.5 text-sm border rounded-md w-48 focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="pl-3 pr-8 py-1.5 text-sm border rounded-md w-48 focus:outline-hidden focus:ring-2 focus:ring-primary/20"
             />
             {searchTerm && (
               <Button
