@@ -11,9 +11,17 @@ const VALID_MODES: ReadonlyArray<ThemeMode> = ['light', 'dark', 'system']
 
 /** 合法的品牌色值 */
 const VALID_BRANDS: ReadonlyArray<BrandTheme> = [
-  'neutral', 'pomegranate', 'china-red', 'wine', 'cinnabar', 'tech-blue',
-  'indigo', 'geek-purple', 'tech-teal', 'vivid-orange', 'ink-black',
+  'neutral', 'pomegranate', 'vivid-orange', 'tech-teal', 'tech-blue', 'indigo',
 ]
+
+/** 已下线的品牌色 → 最接近的现存一套（浏览器里存着旧值的用户不会突然变色太多） */
+const LEGACY_BRANDS: Record<string, BrandTheme> = {
+  'china-red': 'pomegranate',
+  wine: 'pomegranate',
+  cinnabar: 'pomegranate',
+  'geek-purple': 'indigo',
+  'ink-black': 'neutral',
+}
 
 /**
  * 旧数据迁移：旧版本把 'gov-red' 当作一种主题存在 theme 里。
@@ -21,7 +29,7 @@ const VALID_BRANDS: ReadonlyArray<BrandTheme> = [
  */
 function migrateTheme(raw: unknown): { theme: ThemeMode; brand?: BrandTheme } {
   if (raw === 'gov-red') {
-    return { theme: 'light', brand: 'china-red' }
+    return { theme: 'light', brand: 'pomegranate' }
   }
   if (typeof raw === 'string' && VALID_MODES.includes(raw as ThemeMode)) {
     return { theme: raw as ThemeMode }
@@ -30,9 +38,9 @@ function migrateTheme(raw: unknown): { theme: ThemeMode; brand?: BrandTheme } {
 }
 
 function sanitizeBrand(raw: unknown, fallback: BrandTheme): BrandTheme {
-  return typeof raw === 'string' && VALID_BRANDS.includes(raw as BrandTheme)
-    ? (raw as BrandTheme)
-    : fallback
+  if (typeof raw !== 'string') return fallback
+  if (VALID_BRANDS.includes(raw as BrandTheme)) return raw as BrandTheme
+  return LEGACY_BRANDS[raw] ?? fallback
 }
 
 function sanitizeDensity(raw: unknown, fallback: UIDensity): UIDensity {

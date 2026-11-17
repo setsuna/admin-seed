@@ -110,14 +110,14 @@ const LoginPage = () => {
     }
   }
   
-  // 品牌区（bg-primary）在墨黑主题 + 深色模式下会变成浅灰，
+  // 品牌区（bg-primary）在默认中性色 + 深色模式下是近白色（shadcn 深色 primary），
   // 此时白版 logo 看不清，需改用彩色版。
   const isDarkMode =
     theme === 'dark' ||
     (theme === 'system' &&
       typeof window !== 'undefined' &&
       window.matchMedia('(prefers-color-scheme: dark)').matches)
-  const brandAreaIsLight = brand === 'ink-black' && isDarkMode
+  const brandAreaIsLight = brand === 'neutral' && isDarkMode
   
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -317,7 +317,7 @@ const LoginPage = () => {
   // 🆕 右上角控件区：主题切换 + 布局切换
   const renderLayoutToggle = () => (
     <div className="absolute top-4 right-4 z-20 flex items-center gap-2">
-      {/* 主题切换：明暗模式 + 10 套品牌色 */}
+      {/* 主题切换：明暗 / 密度 / 品牌色 */}
       <ThemeSwitcher className="h-9 w-9 rounded-md border border-border/60 bg-card/80 backdrop-blur-xs hover:bg-card hover:shadow-md" />
 
       {/* 布局切换 */}

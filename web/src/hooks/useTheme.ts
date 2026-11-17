@@ -13,7 +13,7 @@ import type { BrandTheme, ThemeMode, UIDensity } from '@/types'
  * 需要在同一作用域解析 --brand。
  *
  * 中性色 / 语义色全局固定，换肤只影响品牌色的 4 个变量，
- * 因此 10 套品牌色 × 2 种明暗都能保持协调。
+ * 因此任意品牌色 × 2 种明暗都能保持协调。
  */
 
 /** 品牌色元信息，用于设置面板展示 */
@@ -24,16 +24,11 @@ export const BRAND_PALETTES: ReadonlyArray<{
   swatch: string
 }> = [
   { id: 'neutral', name: '默认', swatch: '#171717' },
-  { id: 'pomegranate', name: '深石榴红', swatch: '#8C1D22' },
-  { id: 'china-red', name: '中国红', swatch: '#C0181F' },
-  { id: 'wine', name: '酒红', swatch: '#7A1E2B' },
-  { id: 'cinnabar', name: '朱砂红', swatch: '#B5341B' },
+  { id: 'pomegranate', name: '石榴红', swatch: '#8C1D22' },
+  { id: 'vivid-orange', name: '活力橙', swatch: '#F2630C' },
+  { id: 'tech-teal', name: '科技青', swatch: '#0E9488' },
   { id: 'tech-blue', name: '科技蓝', swatch: '#1677FF' },
   { id: 'indigo', name: '靛蓝', swatch: '#4F46E5' },
-  { id: 'geek-purple', name: '极客紫', swatch: '#7C3AED' },
-  { id: 'tech-teal', name: '科技青', swatch: '#0E9488' },
-  { id: 'vivid-orange', name: '活力橙', swatch: '#F2630C' },
-  { id: 'ink-black', name: '墨黑', swatch: '#1F2937' },
 ] as const
 
 export const DEFAULT_BRAND: BrandTheme = 'neutral'

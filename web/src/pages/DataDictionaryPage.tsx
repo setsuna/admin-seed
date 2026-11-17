@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/option-select'
 import { DataTable } from '@/components/features/DataTable'
+import { PageActions } from '@/components/layouts/PageActions'
 import { Card, CardContent } from '@/components/ui/card'
 import DictEditModal from '@/components/features/DictEditModal'
 import { useGlobalDialog } from '@/components/ui/DialogProvider'
@@ -53,8 +54,6 @@ const DataDictionaryPage: React.FC = () => {
     isBatchDeleting,
     isSyncing,
     isExporting,
-    isAllSelected,
-    isIndeterminate,
     setFilters,
     setPagination,
     createDict,
@@ -63,8 +62,7 @@ const DataDictionaryPage: React.FC = () => {
     batchDeleteDicts,
     syncToDevices,
     exportDicts,
-    toggleSelectAll,
-    toggleSelectId
+    setSelectedIds,
   } = useDict()
   
   // 表单状态
@@ -288,19 +286,6 @@ const DataDictionaryPage: React.FC = () => {
 
   const columns: TableColumn<DataDict>[] = [
     {
-      key: 'select',
-      title: '',
-      width: 50,
-      render: (_, record: DataDict) => (
-        <input
-          type="checkbox"
-          checked={selectedIds.includes(record.id)}
-          onChange={() => toggleSelectId(record.id)}
-          className="rounded border-gray-300"
-        />
-      ),
-    },
-    {
       key: 'dictCode',
       title: '字典ID',
       width: 120,
@@ -388,7 +373,7 @@ const DataDictionaryPage: React.FC = () => {
   return (
     <div className="space-y-4">
       {/* 搜索和筛选工具栏 */}
-      <div className="flex items-center justify-between p-4 bg-background rounded-lg border">
+      <div className="flex items-center justify-between rounded-xl border bg-card p-4 shadow-xs">
         <div className="flex items-center gap-4">
           <div className="flex-1 max-w-sm">
             <div className="relative">
@@ -428,69 +413,57 @@ const DataDictionaryPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 操作按钮区域 */}
-      <div className="flex items-center justify-between p-4 bg-background rounded-lg border">
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={isAllSelected}
-            ref={(el) => {
-              if (el) el.indeterminate = isIndeterminate
-            }}
-            onChange={() => toggleSelectAll()}
-            className="rounded border-gray-300"
-          />
-          <span className="text-sm text-muted-foreground">
-            {selectedIds.length > 0 && `已选择 ${selectedIds.length} 项`}
-          </span>
-        </div>
-        
-        <div className="flex items-center gap-2">
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleExport}
-            disabled={isExporting}
-          >
-            <Download className="w-4 h-4" />
-            导出
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleBatchDelete}
-            disabled={selectedIds.length === 0 || isBatchDeleting}
-            className="text-red-600 hover:text-red-700"
-          >
-            <Trash2 className="w-4 h-4" />
-            批量删除
-          </Button>
-          <Button 
-            variant="outline" 
-            size="sm"
-            onClick={handleSyncToDevices}
-            disabled={selectedIds.length === 0 || isSyncing}
-          >
-            <RefreshCw className="w-4 h-4" />
-            同步到设备
-          </Button>
-          <Button onClick={handleCreateNew} disabled={isCreating}>
-            <Plus className="w-4 h-4" />
-            新增字典
-          </Button>
-        </div>
-      </div>
+      {/* 页面级操作：送到顶栏 */}
+      <PageActions>
+        <Button size="sm" className="h-control" onClick={handleCreateNew} disabled={isCreating}>
+          <Plus />
+          新增字典
+        </Button>
+      </PageActions>
 
-      {/* 数据表格 */}
-      <div className="bg-background rounded-lg border">
+      {/* 表格卡：工具栏 + 表格 + 展开详情，同一层边框（不要再给 DataTable 传 bordered） */}
+      <div className="overflow-hidden rounded-xl border bg-card shadow-xs">
+        <div className="flex items-center justify-between gap-2 border-b px-cell py-2">
+          <span className="text-table text-muted-foreground">
+            {selectedIds.length > 0 ? `已选 ${selectedIds.length} 项` : '勾选后可批量删除、同步到设备'}
+          </span>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" className="h-control" onClick={handleExport} disabled={isExporting}>
+              <Download />
+              {selectedIds.length > 0 ? '导出所选' : '导出全部'}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-control text-destructive hover:text-destructive"
+              onClick={handleBatchDelete}
+              disabled={selectedIds.length === 0 || isBatchDeleting}
+            >
+              <Trash2 />
+              批量删除
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-control"
+              onClick={handleSyncToDevices}
+              disabled={selectedIds.length === 0 || isSyncing}
+            >
+              <RefreshCw />
+              同步到设备
+            </Button>
+          </div>
+        </div>
+
         <DataTable
           data={dictionaries}
           columns={columns}
           loading={isLoading}
           pagination={pagination}
           onPaginationChange={setPagination}
-          bordered={true}
-          compact={true}
+          selectable
+          selectedRowKeys={selectedIds}
+          onSelectionChange={setSelectedIds}
         />
         
         {/* 展开的字典详情 */}

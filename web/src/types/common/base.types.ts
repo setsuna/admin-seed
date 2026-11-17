@@ -12,29 +12,28 @@ export type EntityStatus = 'enabled' | 'disabled'
 export type ActiveStatus = 'active' | 'inactive' | 'suspended'
 export type OperationStatus = 'pending' | 'processing' | 'completed' | 'failed'
 
-// 主题系统（两个正交维度，对齐平板端 SealMeet）
+// 主题系统（三个正交维度）
 //
-//   明暗模式 ThemeMode  ×  品牌色 BrandTheme
+//   明暗模式 ThemeMode  ×  品牌色 BrandTheme  ×  界面密度 UIDensity
 //
-// 中性色 / 语义色全局固定（暖灰基调），换肤只换品牌色的 4 个变量：
-// brand / brand-dark / tint / glow。这样 10 套品牌色 × 2 种明暗都能保持协调。
+// 中性色 / 语义色全局固定（shadcn neutral），换肤只换品牌色的 brand / brand-dark / tint，
+// 因此任意品牌色 × 2 种明暗都能保持协调。
 
 /** 明暗模式（system = 跟随系统） */
 export type ThemeMode = 'light' | 'dark' | 'system'
 
-/** 品牌色（10 套，与平板端 BrandPalettes 一致） */
+/**
+ * 品牌色：默认 + 5 种色相各一，互相拉得开。
+ * 早期 10 套里有 4 套红、2 套紫，彼此几乎分不出来，已精简；
+ * 旧值在 store/index.ts 的 LEGACY_BRANDS 里映射到最接近的一套。
+ */
 export type BrandTheme =
   | 'neutral'       // 默认：shadcn 原版中性色（不换肤）
-  | 'pomegranate'   // 深石榴红（默认）
-  | 'china-red'     // 中国红
-  | 'wine'          // 酒红
-  | 'cinnabar'      // 朱砂红
-  | 'tech-blue'     // 科技蓝
-  | 'indigo'        // 靖蓝
-  | 'geek-purple'   // 极客紫
-  | 'tech-teal'     // 科技青
+  | 'pomegranate'   // 石榴红
   | 'vivid-orange'  // 活力橙
-  | 'ink-black'     // 墨黑
+  | 'tech-teal'     // 科技青
+  | 'tech-blue'     // 科技蓝
+  | 'indigo'        // 靛蓝
 
 /**
  * 界面密度（第三个正交维度，与明暗、品牌色互不影响）

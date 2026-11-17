@@ -133,18 +133,13 @@
   --bg-page: oklch(0.145 0 0);
 }
 
-/* ---------- 3. 品牌色换肤（默认 neutral = 不覆盖，纯 shadcn）----------
+/* ---------- 3. 品牌色换肤（默认 neutral = 不覆盖，纯 shadcn；另 5 种色相各一）----------
  * 选了品牌色时只换「主按钮 / 焦点环 / 侧栏选中」，中性色一律不动。 */
 [data-brand='pomegranate']  { --brand: hsl(357 66% 33%);  --brand-dark: hsl(357 71% 22%); --tint: hsl(0 60% 96%); }
-[data-brand='china-red']    { --brand: hsl(357 78% 42%);  --brand-dark: hsl(357 80% 31%); --tint: hsl(0 77% 96%); }
-[data-brand='wine']         { --brand: hsl(349 60% 30%);  --brand-dark: hsl(349 63% 19%); --tint: hsl(345 45% 96%); }
-[data-brand='cinnabar']     { --brand: hsl(12 74% 41%);   --brand-dark: hsl(12 76% 28%);  --tint: hsl(20 60% 96%); }
 [data-brand='tech-blue']    { --brand: hsl(217 100% 54%); --brand-dark: hsl(217 90% 41%); --tint: hsl(217 100% 97%); }
 [data-brand='indigo']       { --brand: hsl(243 75% 59%);  --brand-dark: hsl(245 50% 42%); --tint: hsl(245 87% 97%); }
-[data-brand='geek-purple']  { --brand: hsl(262 83% 58%);  --brand-dark: hsl(263 70% 42%); --tint: hsl(262 87% 97%); }
 [data-brand='tech-teal']    { --brand: hsl(175 83% 32%);  --brand-dark: hsl(175 72% 24%); --tint: hsl(168 43% 95%); }
 [data-brand='vivid-orange'] { --brand: hsl(23 90% 50%);   --brand-dark: hsl(21 89% 40%);  --tint: hsl(27 82% 96%); }
-[data-brand='ink-black']    { --brand: hsl(215 28% 17%);  --brand-dark: hsl(222 40% 8%);  --tint: hsl(220 16% 95%); }
 
 [data-brand]:not([data-brand='neutral']) {
   --primary: var(--brand);
@@ -158,15 +153,6 @@
 /* 深色 + 品牌色：浅色 tint 在深底上太刺眼，改为品牌色淡叠加 */
 .dark[data-brand]:not([data-brand='neutral']) {
   --tint: color-mix(in oklab, var(--brand) 22%, var(--background));
-}
-
-/* 深色 + 墨黑：brand 与背景几乎同色，改用浅灰作主色 */
-.dark[data-brand='ink-black'] {
-  --primary: oklch(0.75 0.02 255);
-  --primary-foreground: oklch(0.2 0.02 255);
-  --ring: oklch(0.75 0.02 255);
-  --sidebar-primary: oklch(0.75 0.02 255);
-  --sidebar-primary-foreground: oklch(0.2 0.02 255);
 }
 
 /* ---------- 4. 界面密度：只放尺寸 ----------

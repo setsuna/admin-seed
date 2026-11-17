@@ -90,8 +90,10 @@ function AppLogo() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <div className="flex items-center gap-2 px-2">
-          {/* 方形标记：侧边栏收起时仅剩 32px 宽，只显示图形不显示文字 */}
+        {/* 收起时侧栏只有 48px 宽、扣掉 SidebarHeader 的 px-2 只剩 32px，
+            正好放下 32px 的标记：此时去掉内边距并居中，否则会右偏 8px */}
+        <div className={cn('flex items-center gap-2', state === 'expanded' ? 'px-2' : 'justify-center')}>
+          {/* 方形标记：侧边栏收起时只显示图形不显示文字 */}
           <Mark size={32} className="shrink-0 text-primary" />
           {state === 'expanded' && (
             <div className="grid flex-1 text-left text-sm leading-tight">
@@ -293,7 +295,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
 
       <SidebarFooter>
-        <div className="px-2 py-1 text-xs text-muted-foreground">
+        {/* 收起时内容区只有 32px，版本号放不下：缩小字号、左右借回 SidebarFooter 的内边距并居中 */}
+        <div
+          className={cn(
+            'py-1 text-muted-foreground tabular-nums',
+            state === 'expanded' ? 'px-2 text-xs' : '-mx-2 whitespace-nowrap text-center text-[10px]'
+          )}
+        >
           {state === 'expanded' ? `版本 ${APP_VERSION_FULL}` : APP_VERSION_FULL}
         </div>
       </SidebarFooter>

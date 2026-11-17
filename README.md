@@ -146,7 +146,7 @@ npx shadcn@latest add button --overwrite   # 用官方最新版覆盖
 | 维度 | 挂在 `<html>` 上 | 说明 |
 |---|---|---|
 | 明暗 | `class="dark"` | shadcn 原版浅色 / 深色变量（oklch） |
-| 品牌色 | `data-brand="neutral"` | 默认 `neutral` = 纯 shadcn；另有 10 套品牌色，只覆盖 primary / ring / 侧栏选中 |
+| 品牌色 | `data-brand="neutral"` | 默认 `neutral` = 纯 shadcn；另有石榴红 / 活力橙 / 科技青 / 科技蓝 / 靛蓝 5 套，只覆盖 primary / ring / 侧栏选中 |
 | 密度 | `data-density="comfortable"` | 见下节 |
 
 shadcn 的变量名和值保持原样，项目自己的变量（`--success` / `--warning` / `--text-*` / `--bg-*` 等）
