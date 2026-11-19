@@ -4,7 +4,7 @@ import { createAuthSlice } from './slices/auth.slice'
 import { createUISlice } from './slices/ui.slice'
 import { createAppSlice } from './slices/app.slice'
 import type { GlobalStore, PersistedState } from './types'
-import type { ThemeMode, BrandTheme, UIDensity } from '@/types'
+import type { ThemeMode, BrandTheme } from '@/types'
 
 /** 合法的明暗模式值 */
 const VALID_MODES: ReadonlyArray<ThemeMode> = ['light', 'dark', 'system']
@@ -43,10 +43,6 @@ function sanitizeBrand(raw: unknown, fallback: BrandTheme): BrandTheme {
   return LEGACY_BRANDS[raw] ?? fallback
 }
 
-function sanitizeDensity(raw: unknown, fallback: UIDensity): UIDensity {
-  return raw === 'comfortable' || raw === 'compact' ? raw : fallback
-}
-
 // 创建全局store
 export const useStore = create<GlobalStore>()(
   persist(
@@ -64,7 +60,6 @@ export const useStore = create<GlobalStore>()(
         ui: {
           theme: state.theme,
           brand: state.brand,
-          density: state.density,
         },
       }),
       merge: (persistedState, currentState) => {
@@ -81,7 +76,6 @@ export const useStore = create<GlobalStore>()(
             persisted.ui?.brand ?? migrated.brand,
             currentState.brand
           ),
-          density: sanitizeDensity(persisted.ui?.density, currentState.density),
         }
       },
     }
@@ -108,14 +102,12 @@ export const useAuth = () => useStore((state) => ({
 export const useUI = () => useStore((state) => ({
   theme: state.theme,
   brand: state.brand,
-  density: state.density,
   notifications: state.notifications,
   globalLoading: state.globalLoading,
   soundEnabled: state.soundEnabled,
   soundVolume: state.soundVolume,
   setTheme: state.setTheme,
   setBrand: state.setBrand,
-  setDensity: state.setDensity,
   addNotification: state.addNotification,
   removeNotification: state.removeNotification,
   clearNotifications: state.clearNotifications,

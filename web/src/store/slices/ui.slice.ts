@@ -1,10 +1,6 @@
 import type { StateCreator } from 'zustand'
 import type { UISlice, GlobalStore } from '../types'
-import type { Notification, UIDensity } from '@/types'
-
-/** 默认密度：由 .env 的 VITE_UI_DENSITY 决定，新项目 clone 后改这一行即可 */
-export const DEFAULT_DENSITY: UIDensity =
-  import.meta.env.VITE_UI_DENSITY === 'compact' ? 'compact' : 'comfortable'
+import type { Notification } from '@/types'
 
 export const createUISlice: StateCreator<
   GlobalStore,
@@ -20,9 +16,6 @@ export const createUISlice: StateCreator<
   brand: 'neutral',
   setBrand: (brand) => set({ brand }),
 
-  // 界面密度：舒展 / 紧凑
-  density: DEFAULT_DENSITY,
-  setDensity: (density) => set({ density }),
   
   // 音效系统
   soundEnabled: true,

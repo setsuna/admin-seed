@@ -1,13 +1,12 @@
 import { useEffect } from 'react'
 import { useUI } from '@/store'
-import type { BrandTheme, ThemeMode, UIDensity } from '@/types'
+import type { BrandTheme, ThemeMode } from '@/types'
 
 /**
- * 主题管理 Hook —— 三个正交维度。
+ * 主题管理 Hook —— 两个正交维度。
  *
  *   明暗模式 mode    → <html class="dark">
  *   品牌色   brand   → <html data-brand="pomegranate">
- *   界面密度 density → <html data-density="compact">
  *
  * 两者必须挂在同一元素（html）上，因为 CSS 里 --primary: var(--brand)
  * 需要在同一作用域解析 --brand。
@@ -48,12 +47,8 @@ function applyBrand(brand: BrandTheme) {
   window.document.documentElement.setAttribute('data-brand', brand)
 }
 
-function applyDensity(density: UIDensity) {
-  window.document.documentElement.setAttribute('data-density', density)
-}
-
 export function useTheme() {
-  const { theme, setTheme, brand, setBrand, density, setDensity } = useUI()
+  const { theme, setTheme, brand, setBrand } = useUI()
 
   // 应用明暗模式
   useEffect(() => {
@@ -64,11 +59,6 @@ export function useTheme() {
   useEffect(() => {
     applyBrand(brand)
   }, [brand])
-
-  // 应用界面密度
-  useEffect(() => {
-    applyDensity(density)
-  }, [density])
 
   // 跟随系统时监听系统偏好变化
   useEffect(() => {
@@ -81,5 +71,5 @@ export function useTheme() {
     return () => mediaQuery.removeEventListener('change', handleChange)
   }, [theme])
 
-  return { theme, setTheme, brand, setBrand, density, setDensity }
+  return { theme, setTheme, brand, setBrand }
 }

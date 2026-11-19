@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Plus, Edit, Trash2, Search, RefreshCw, Building2, Users, Phone, Mail } from 'lucide-react'
+import { Plus, Trash2, Search, RefreshCw, Building2, Users, Phone, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { DataTable } from '@/components/features/DataTable'
 import { Select } from '@/components/ui/option-select'
-import { StatusIndicator } from '@/components/ui/StatusIndicator'
+import { StatusTag } from '@/components/ui/StatusTag'
+import { RowActions } from '@/components/features/RowActions'
 import { Loading } from '@/components/ui/Loading'
 import { FormModal } from '@/components/ui/FormModal'
 import { useGlobalDialog } from '@/components/ui/DialogProvider'
@@ -254,10 +255,7 @@ const DepartmentPage = () => {
       key: 'status',
       title: '状态',
       render: (value: string) => (
-        <StatusIndicator 
-          status={value === 'enabled' ? 'success' : 'error'}
-          text={value === 'enabled' ? '启用' : '禁用'}
-        />
+        <StatusTag tone={value === 'enabled' ? 'success' : 'neutral'}>{value === 'enabled' ? '启用' : '禁用'}</StatusTag>
       )
     },
     {
@@ -267,26 +265,14 @@ const DepartmentPage = () => {
     },
     {
       key: 'actions',
-      title: '操作',
-      align: 'center' as const,
+      title: '',
+      width: 56,
+      align: 'right' as const,
       render: (_: any, record: Department) => (
-        <div className="flex items-center space-x-1">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => handleEdit(record)}
-          >
-            <Edit className="h-4 w-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => handleDelete(record.id)}
-            className="text-destructive hover:text-destructive"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
+        <RowActions
+          actions={[{ key: 'edit', label: '编辑', onClick: () => handleEdit(record) }]}
+          more={[{ key: 'delete', label: '删除', danger: true, onClick: () => handleDelete(record.id) }]}
+        />
       )
     }
   ]
@@ -403,44 +389,49 @@ const DepartmentPage = () => {
       </div>
       
       {/* 数据展示区域 */}
-      <Card className="gap-0 overflow-hidden py-0">
-        <CardContent className="p-0">
-          {isLoading ? (
-            <div className="p-8">
-              <Loading />
-            </div>
-          ) : viewMode === 'table' ? (
-            <DataTable
-              data={departments}
-              columns={columns}
-              loading={isLoading}
-              pagination={pagination}
-              onPaginationChange={(newPagination) => {
-                setPagination({ 
-                  page: newPagination.page, 
-                  pageSize: newPagination.pageSize 
-                })
-              }}
-            />
-          ) : (
-            <div className="p-6">
-              <DepartmentTree
-                data={departmentTree}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onAdd={handleAdd}
-                loading={isLoading}
-              />
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {/* 表格视图：DataTable 自带官方圆角边框、分页在框外；树视图仍放在卡片里 */}
+      {viewMode === 'table' && !isLoading ? (
+        <DataTable
+          bordered
+          data={departments}
+          columns={columns}
+          loading={isLoading}
+          pagination={pagination}
+          onPaginationChange={(newPagination) => {
+            setPagination({ 
+              page: newPagination.page, 
+              pageSize: newPagination.pageSize 
+            })
+          }}
+        />
+      ) : (
+        <Card className="gap-0 overflow-hidden py-0">
+          <CardContent className="p-0">
+            {isLoading ? (
+              <div className="p-8">
+                <Loading />
+              </div>
+            ) : (
+              <div className="p-6">
+                <DepartmentTree
+                  data={departmentTree}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onAdd={handleAdd}
+                  loading={isLoading}
+                />
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
       
       {/* 表单弹窗 */}
       <FormModal
         open={showForm}
         onOpenChange={setShowForm}
         title={editingDepartment ? '编辑部门' : '新建部门'}
+        variant="sheet"
         fields={formFields}
         onSubmit={handleSubmit}
         loading={isCreating || isUpdating}

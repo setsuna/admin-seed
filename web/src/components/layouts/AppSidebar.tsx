@@ -20,7 +20,7 @@ import {
 } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { Mark } from '@/components/ui/Logo'
-import { APP_MAJOR_VERSION, APP_VERSION_FULL } from '@/utils/version'
+import { APP_MAJOR_VERSION } from '@/utils/version'
 import {
   Sidebar,
   SidebarContent,
@@ -152,7 +152,8 @@ function NavGroup({
 }
 
 // 主 Sidebar 组件
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+/** footer：侧栏底部内容（MainLayout 传入当前用户 NavUser） */
+export function AppSidebar({ footer, ...props }: React.ComponentProps<typeof Sidebar> & { footer?: React.ReactNode }) {
   const { menus: menuItems, isLoading } = useMenuPermission()
   const { state } = useSidebar()
 
@@ -164,6 +165,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <div className="text-sm text-muted-foreground">加载中...</div>
           </div>
         </SidebarContent>
+        <SidebarFooter>{footer}</SidebarFooter>
       </Sidebar>
     )
   }
@@ -294,17 +296,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         ))}
       </SidebarContent>
 
-      <SidebarFooter>
-        {/* 收起时内容区只有 32px，版本号放不下：缩小字号、左右借回 SidebarFooter 的内边距并居中 */}
-        <div
-          className={cn(
-            'py-1 text-muted-foreground tabular-nums',
-            state === 'expanded' ? 'px-2 text-xs' : '-mx-2 whitespace-nowrap text-center text-[10px]'
-          )}
-        >
-          {state === 'expanded' ? `版本 ${APP_VERSION_FULL}` : APP_VERSION_FULL}
-        </div>
-      </SidebarFooter>
+      <SidebarFooter>{footer}</SidebarFooter>
 
       <SidebarRail />
     </Sidebar>

@@ -138,7 +138,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
       closeOnOverlay={false}
       showCloseButton={!loading}
     >
-      <form onSubmit={handleSubmit} className="p-6 space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-4 px-6 pt-4 pb-6">
         {/* 全局错误 */}
         {errors.submit && (
           <div className="text-sm text-error bg-error/10 p-3 rounded-md border border-error/30">
@@ -148,7 +148,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
 
         {/* 原密码 */}
         <div>
-          <label className="block text-sm font-medium text-text-secondary mb-2">
+          <label className="mb-3 block text-sm leading-none font-medium text-foreground">
             原密码
           </label>
           <div className="relative">
@@ -175,7 +175,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
 
         {/* 新密码 */}
         <div>
-          <label className="block text-sm font-medium text-text-secondary mb-2">
+          <label className="mb-3 block text-sm leading-none font-medium text-foreground">
             新密码
           </label>
           <div className="relative">
@@ -202,7 +202,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordDialogProps> = ({
 
         {/* 确认密码 */}
         <div>
-          <label className="block text-sm font-medium text-text-secondary mb-2">
+          <label className="mb-3 block text-sm leading-none font-medium text-foreground">
             确认新密码
           </label>
           <div className="relative">

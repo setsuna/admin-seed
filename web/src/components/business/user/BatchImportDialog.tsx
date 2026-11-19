@@ -272,7 +272,7 @@ export function BatchImportDialog({
           {/* 配置区 */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1.5">
+              <label className="mb-3 block text-sm leading-none font-medium text-foreground">
                 部门 <span className="text-destructive">*</span>
               </label>
               <Select value={department} onValueChange={setDepartment}>
@@ -290,7 +290,7 @@ export function BatchImportDialog({
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1.5">
+              <label className="mb-3 block text-sm leading-none font-medium text-foreground">
                 角色 <span className="text-destructive">*</span>
               </label>
               <Select value={role} onValueChange={setRole}>
@@ -308,7 +308,7 @@ export function BatchImportDialog({
             </div>
 
             <div className="col-span-2">
-              <label className="block text-sm font-medium mb-1.5">
+              <label className="mb-3 block text-sm leading-none font-medium text-foreground">
                 默认密码 <span className="text-muted-foreground text-xs">（可选）</span>
               </label>
               <Input
@@ -377,7 +377,7 @@ export function BatchImportDialog({
           {/* 预览表格 */}
           {parsedUsers.length > 0 && (
             <div>
-              <label className="block text-sm font-medium mb-1.5">
+              <label className="mb-3 block text-sm leading-none font-medium text-foreground">
                 数据预览（前 50 条）
               </label>
               <div className="border rounded-lg overflow-hidden">

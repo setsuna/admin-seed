@@ -141,13 +141,12 @@ npx shadcn@latest add button --overwrite   # 用官方最新版覆盖
 
 ### 主题 token
 
-变量在 `src/styles/globals.css`，Tailwind 映射在 `src/index.css` 的 `@theme inline`。三个维度互不影响：
+变量在 `src/styles/globals.css`，Tailwind 映射在 `src/index.css` 的 `@theme inline`。两个维度互不影响：
 
 | 维度 | 挂在 `<html>` 上 | 说明 |
 |---|---|---|
 | 明暗 | `class="dark"` | shadcn 原版浅色 / 深色变量（oklch） |
 | 品牌色 | `data-brand="neutral"` | 默认 `neutral` = 纯 shadcn；另有石榴红 / 活力橙 / 科技青 / 科技蓝 / 靛蓝 5 套，只覆盖 primary / ring / 侧栏选中 |
-| 密度 | `data-density="comfortable"` | 见下节 |
 
 shadcn 的变量名和值保持原样，项目自己的变量（`--success` / `--warning` / `--text-*` / `--bg-*` 等）
 另起名字放在后面，**不要改 shadcn 原版变量的值**，否则以后 `shadcn add` 进来的组件会对不上。
@@ -157,23 +156,19 @@ shadcn 的变量名和值保持原样，项目自己的变量（`--success` / `-
 1. **侧栏顶部与顶栏同高、同一条底边线**（都用 `h-header`），左右两条横线必须对齐。
 2. **不要给内容区铺灰底**。`--bg-page` 只给登录页这类没有侧栏的整页用。
 
-### 界面密度（两套风格）
+### 布局与尺寸（照 shadcn 官方 dashboard）
 
-第三个主题维度，与明暗、品牌色正交：`<html data-density="comfortable | compact">`。
+参照 <https://ui.shadcn.com/examples/dashboard>，只有一套尺寸（紧凑模式已去掉）：
 
-| | 舒展卡片风 comfortable | 紧凑数据风 compact |
-|---|---|---|
-| 适合 | 数据量小、偏展示的后台 | 大量列表查看与批量操作 |
-| 顶栏 / 行高 / 字号 | 56px / 48px / 14px（shadcn 默认尺寸） | 48px / 36px / 13px |
-| 列表页 | 统计卡片 → 筛选卡 → 表格卡 | 一张卡撑满视口：一行工具栏 + 表格（表头吸顶、分页钉底） |
-
-- 默认值：`web/.env.*` 里的 `VITE_UI_DENSITY`（新项目 clone 后改这一行）。
-- 用户可在右上角主题面板切换，选择记在浏览器 localStorage。
-- 尺寸 token 在 `src/styles/globals.css` 的 `[data-density]` 块，对应工具类 `h-header` / `h-control` / `h-row` /
+- 侧栏通顶：256px，收起 48px；顶部系统名，底部当前用户（`components/layouts/NavUser.tsx`：修改密码、退出登录、版本号）。
+- 顶栏只在右侧内容栏上方，48 + 1px 底线：折叠按钮 | 面包屑 … 页面操作按钮 + 音效 + 主题。
+  手机上面包屑只显示当前页，页面操作按钮换到顶栏第二行。
+- 内容区内边距 16px（≥1024px 时 24px），区块间距 16px（≥768px 时 24px）；表格行高 48、表头 40、正文 14px。
+- 尺寸 token 在 `src/styles/globals.css` 第 4 节，对应工具类 `h-header` / `h-control` / `h-row` /
   `p-page` / `px-cell` / `gap-section` / `text-table`（映射见 `src/index.css` 的 `@theme inline`）。
-  **页面里不要写死 `h-10`、`p-6` 这类尺寸**，否则切换密度时会对不上。
+  **页面里不要写死 `h-10`、`p-6` 这类尺寸**，统一改 token 才不会对不上。
 - 列表页用 `components/features/ListPage` + `DataTable`（TanStack Table）+ `useColumnSettings`，
-  页面只声明有哪几块，怎么摆由密度决定。参考 `pages/UserManagePage.tsx`。
+  页面只声明有哪几块。参考 `pages/UserManagePage.tsx`。
 
 ### 页面头部与操作按钮
 

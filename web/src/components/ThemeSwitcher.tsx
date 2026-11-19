@@ -1,14 +1,13 @@
-import { Monitor, Moon, Sun, Check, Palette, StretchHorizontal, AlignJustify } from 'lucide-react'
+import { Monitor, Moon, Sun, Check, Palette } from 'lucide-react'
 import { useTheme, BRAND_PALETTES } from '@/hooks/useTheme'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/utils'
-import type { ThemeMode, UIDensity } from '@/types'
+import type { ThemeMode } from '@/types'
 
 /**
- * 主题切换器 —— 三个正交维度。
+ * 主题切换器 —— 两个正交维度。
  *
  *   外观：明暗模式（浅色 / 深色 / 跟随系统）
- *   密度：舒展卡片风 / 紧凑数据风
  *   主题色：默认（shadcn 中性）+ 5 种品牌色
  *
  * 中性色全局固定，换肤只改品牌色，因此任意组合都保持协调。
@@ -24,21 +23,12 @@ const modeOptions: ReadonlyArray<{
   { value: 'system', label: '跟随系统', icon: Monitor },
 ]
 
-const densityOptions: ReadonlyArray<{
-  value: UIDensity
-  label: string
-  icon: typeof Sun
-}> = [
-  { value: 'comfortable', label: '舒展', icon: StretchHorizontal },
-  { value: 'compact', label: '紧凑', icon: AlignJustify },
-]
-
 interface ThemeSwitcherProps {
   className?: string
 }
 
 export function ThemeSwitcher({ className }: ThemeSwitcherProps) {
-  const { theme, setTheme, brand, setBrand, density, setDensity } = useTheme()
+  const { theme, setTheme, brand, setBrand } = useTheme()
 
   const currentMode = modeOptions.find((o) => o.value === theme) ?? modeOptions[2]
   const currentBrand = BRAND_PALETTES.find((b) => b.id === brand) ?? BRAND_PALETTES[0]
@@ -73,35 +63,6 @@ export function ThemeSwitcher({ className }: ThemeSwitcherProps) {
                 onClick={() => setTheme(option.value)}
                 className={cn(
                   'flex flex-col items-center gap-1.5 rounded-md px-2 py-2.5 text-xs transition-colors',
-                  isActive
-                    ? 'bg-accent text-accent-foreground'
-                    : 'text-muted-foreground hover:bg-accent/60 hover:text-accent-foreground'
-                )}
-              >
-                <Icon className="h-4 w-4" />
-                <span className="whitespace-nowrap">{option.label}</span>
-              </button>
-            )
-          })}
-        </div>
-
-        {/* ---------- 界面密度 ---------- */}
-        <div className="mb-1 px-1 text-xs font-medium text-muted-foreground">
-          密度
-        </div>
-        <div className="mb-4 grid grid-cols-2 gap-1">
-          {densityOptions.map((option) => {
-            const Icon = option.icon
-            const isActive = density === option.value
-
-            return (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => setDensity(option.value)}
-                aria-pressed={isActive}
-                className={cn(
-                  'flex items-center justify-center gap-1.5 rounded-md px-2 py-2 text-xs transition-colors',
                   isActive
                     ? 'bg-accent text-accent-foreground'
                     : 'text-muted-foreground hover:bg-accent/60 hover:text-accent-foreground'

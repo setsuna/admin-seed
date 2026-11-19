@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Plus, Upload, Edit, Trash2, Search, RefreshCw, Shield, Users, UserCheck, UserX, AlertTriangle, Key, ShieldCheck, ShieldAlert, Building } from 'lucide-react'
+import { Upload, Trash2, Search, RefreshCw, Shield, Users, UserCheck, UserX, AlertTriangle, Key, ShieldCheck, ShieldAlert, Building } from 'lucide-react'
+import { CirclePlusFilled } from '@/components/icons/CirclePlusFilled'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { DataTable } from '@/components/features/DataTable'
@@ -12,7 +13,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { StatusIndicator } from '@/components/ui/StatusIndicator'
+import { StatusTag } from '@/components/ui/StatusTag'
+import { Badge } from '@/components/ui/badge'
+import { RowActions } from '@/components/features/RowActions'
 import { Loading } from '@/components/ui/Loading'
 import { FormModal } from '@/components/ui/FormModal'
 import {
@@ -395,7 +398,7 @@ const UserManagePage: React.FC<UserManagePageProps> = ({ mode }) => {
     }
   }
   
-  // 表格列定义：单行显示，不再用「头像 + 用户名/邮箱两行」，紧凑模式下一屏能多放 2~3 倍行数
+  // 表格列定义：单行显示，不再用「头像 + 用户名/邮箱两行」，一屏能多放 2~3 倍行数
   const roleMap: Record<string, { label: string; className: string }> = {
     admin: { label: '管理员', className: 'bg-error/10 text-error' },
     security_admin: { label: '安全管理员', className: 'bg-primary/10 text-primary' },
@@ -409,8 +412,6 @@ const UserManagePage: React.FC<UserManagePageProps> = ({ mode }) => {
     inactive: { label: '禁用', type: 'warning' },
     suspended: { label: '停用', type: 'error' }
   }
-
-  const iconBtn = 'h-control w-control p-0'
 
   const getColumns = (): TableColumn<User>[] => {
     const baseColumns: TableColumn<User>[] = [
@@ -462,12 +463,7 @@ const UserManagePage: React.FC<UserManagePageProps> = ({ mode }) => {
         title: '角色',
         width: 110,
         render: (role: string) => {
-          const roleInfo = roleMap[role] || { label: role || '未知', className: 'bg-muted text-muted-foreground' }
-          return (
-            <span className={cn('inline-flex items-center rounded px-1.5 py-0.5 text-xs font-medium', roleInfo.className)}>
-              {roleInfo.label}
-            </span>
-          )
+          return <Badge variant="outline" className="px-1.5 text-muted-foreground">{roleMap[role]?.label || role || '未知'}</Badge>
         }
       },
       // 「密级」列已移除：种子项目不使用涉密场景的密级体系。
@@ -478,7 +474,7 @@ const UserManagePage: React.FC<UserManagePageProps> = ({ mode }) => {
         width: 90,
         render: (status: string) => {
           const statusInfo = statusMap[status] || { label: status || '未知', type: 'warning' as const }
-          return <StatusIndicator status={statusInfo.type} text={statusInfo.label} />
+          return <StatusTag tone={statusInfo.type === 'error' ? 'danger' : statusInfo.type}>{statusInfo.label}</StatusTag>
         }
       },
       {
@@ -493,113 +489,53 @@ const UserManagePage: React.FC<UserManagePageProps> = ({ mode }) => {
       }
     ]
     
-    // 根据模式添加操作列
+    // 根据模式添加操作列（照官方：靠右的「⋮」菜单，危险操作排最后、红字并二次确认）
     if (mode === 'admin') {
       baseColumns.push({
         key: 'actions',
-        title: '操作',
-        width: 88,
+        title: '',
+        width: 56,
+        align: 'right',
         hideable: false,
         render: (_: any, user: User) => (
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className={iconBtn}
-              onClick={() => handleEditUser(user)}
-              disabled={isUpdating}
-              title="编辑用户"
-              aria-label="编辑用户"
-            >
-              <Edit />
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className={cn(iconBtn, 'text-error hover:text-error')}
-              onClick={() => handleDeleteUser(user)}
-              disabled={isDeleting}
-              title="删除用户"
-              aria-label="删除用户"
-            >
-              <Trash2 />
-            </Button>
-          </div>
+          <RowActions
+            actions={[{ key: 'edit', label: '编辑', onClick: () => handleEditUser(user), disabled: isUpdating }]}
+            more={[{ key: 'delete', label: '删除', danger: true, onClick: () => handleDeleteUser(user), disabled: isDeleting }]}
+          />
         )
       })
     } else if (mode === 'security') {
       baseColumns.push({
         key: 'actions',
-        title: '安全操作',
-        width: 120,
+        title: '',
+        width: 56,
+        align: 'right',
         hideable: false,
         render: (_: any, user: User) => (
-          <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              size="sm"
-              className={iconBtn}
-              onClick={() => handleResetPassword(user)}
-              disabled={isResettingPassword}
-              title="重置密码"
-            >
-              <Key />
-            </Button>
-            {user.status === 'active' ? (
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(iconBtn, 'text-warning')}
-                onClick={() => handleUpdateStatus(user, 'inactive')}
-                disabled={isUpdatingStatus}
-                title="禁用用户"
-              >
-                <UserX />
-              </Button>
-            ) : (
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(iconBtn, 'text-success')}
-                onClick={() => handleUpdateStatus(user, 'active')}
-                disabled={isUpdatingStatus}
-                title="启用用户"
-              >
-                <UserCheck />
-              </Button>
-            )}
-            {user.status !== 'suspended' && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(iconBtn, 'text-error')}
-                onClick={() => handleUpdateStatus(user, 'suspended')}
-                disabled={isUpdatingStatus}
-                title="停用用户"
-              >
-                <AlertTriangle />
-              </Button>
-            )}
-          </div>
+          <RowActions
+            actions={[{ key: 'reset', label: '重置密码', onClick: () => handleResetPassword(user), disabled: isResettingPassword }]}
+            more={[
+              user.status === 'active'
+                ? { key: 'disable', label: '禁用', danger: true, onClick: () => handleUpdateStatus(user, 'inactive'), disabled: isUpdatingStatus }
+                : { key: 'enable', label: '启用', onClick: () => handleUpdateStatus(user, 'active'), disabled: isUpdatingStatus },
+              ...(user.status !== 'suspended'
+                ? [{ key: 'suspend', label: '停用', danger: true, onClick: () => handleUpdateStatus(user, 'suspended'), disabled: isUpdatingStatus }]
+                : []),
+            ]}
+          />
         )
       })
     } else if (mode === 'security_level') {
       baseColumns.push({
         key: 'actions',
-        title: '操作',
-        width: 80,
+        title: '',
+        width: 56,
+        align: 'right',
         hideable: false,
         render: (_: any, user: User) => (
-          <Button
-            variant="ghost"
-            size="sm"
-            className={iconBtn}
-            onClick={() => handleUpdateSecurityLevel(user)}
-            disabled={isUpdatingSecurityLevel}
-            title="调整密级"
-          >
-            <Key />
-          </Button>
+          <RowActions
+            actions={[{ key: 'level', label: '调整密级', onClick: () => handleUpdateSecurityLevel(user), disabled: isUpdatingSecurityLevel }]}
+          />
         )
       })
     }
@@ -683,7 +619,7 @@ const UserManagePage: React.FC<UserManagePageProps> = ({ mode }) => {
     }
   ]
   
-  // 统计：舒展模式是卡片，紧凑模式自动收成工具栏里的一行摘要（由 ListPage 决定）
+  // 统计：ListPage 渲染成顶部的统计卡片
   const stats: StatItem[] = !userStats ? [] : mode === 'security_level'
     ? [
         { key: 'total', label: '总用户数', value: userStats.total, icon: Users, tone: 'primary' },
@@ -757,7 +693,7 @@ const UserManagePage: React.FC<UserManagePageProps> = ({ mode }) => {
               批量导入
             </Button>
             <Button size="sm" className="h-control" onClick={handleCreateUser} disabled={isCreating}>
-              <Plus />
+              <CirclePlusFilled />
               新增用户
             </Button>
           </>
@@ -854,6 +790,7 @@ const UserManagePage: React.FC<UserManagePageProps> = ({ mode }) => {
           open={isFormModalOpen}
           onOpenChange={setIsFormModalOpen}
           title={editingUser ? '编辑用户' : '新增用户'}
+          variant="sheet"
           fields={formFields}
           columns={2}
           initialData={editingUser ? {

@@ -16,6 +16,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { DataTable } from '@/components/features/DataTable'
+import { StatusTag } from '@/components/ui/StatusTag'
+import { Badge } from '@/components/ui/badge'
 import {
   Select,
   SelectContent,
@@ -314,9 +316,9 @@ const LogPage: React.FC<LogPageProps> = ({ mode }) => {
       title: '结果',
       width: 100,
       render: (result: LogOperationResult) => (
-        <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${resultConfig[result]?.bgColor} ${resultConfig[result]?.color}`}>
+        <StatusTag tone={result === 'success' ? 'success' : 'danger'}>
           {resultConfig[result]?.label || result}
-        </div>
+        </StatusTag>
       )
     },
     {
@@ -324,9 +326,9 @@ const LogPage: React.FC<LogPageProps> = ({ mode }) => {
       title: '行为',
       width: 100,
       render: (action: ActionCategory) => (
-        <span className={`font-medium ${actionConfig[action]?.color}`}>
+        <Badge variant="outline" className="px-1.5 text-muted-foreground">
           {actionConfig[action]?.label || action}
-        </span>
+        </Badge>
       )
     },
     {
@@ -566,18 +568,15 @@ const LogPage: React.FC<LogPageProps> = ({ mode }) => {
       </Card>
 
       {/* 日志表格 */}
-      <Card className="gap-0 overflow-hidden py-0">
-        <CardContent className="p-0">
-          <DataTable
-            data={logs}
-            columns={columns}
-            loading={isLoading}
-            pagination={pagination}
-            onPaginationChange={handlePaginationChange}
-            rowKey="id"
-          />
-        </CardContent>
-      </Card>
+      <DataTable
+        bordered
+        data={logs}
+        columns={columns}
+        loading={isLoading}
+        pagination={pagination}
+        onPaginationChange={handlePaginationChange}
+        rowKey="id"
+      />
     </div>
   )
 }

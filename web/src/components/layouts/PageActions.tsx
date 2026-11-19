@@ -16,6 +16,8 @@ import { createPortal } from 'react-dom'
  * </PageActions>
  * ```
  *
+ * 桌面上与面包屑同一行；手机上换到顶栏第二行（按钮多时自动换行）。
+ *
  * 注意：同一时刻只应有一个页面渲染 PageActions；路由切换时旧的会自动卸载。
  */
 export function PageActions({ children }: { children: React.ReactNode }) {
@@ -28,5 +30,5 @@ export function PageActions({ children }: { children: React.ReactNode }) {
   }, [])
 
   if (!host) return null
-  return createPortal(<div className="flex items-center gap-2">{children}</div>, host)
+  return createPortal(<div className="flex flex-wrap items-center gap-2 md:shrink-0 md:flex-nowrap">{children}</div>, host)
 }

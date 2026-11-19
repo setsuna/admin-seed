@@ -18,9 +18,10 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useDialog } from '@/hooks/useModal'
 import { useNotifications } from '@/hooks/useNotifications'
 import {
-  ChevronRight, ChevronDown, Plus, Pencil, Trash2, Shield,
+  ChevronRight, ChevronDown, Pencil, Trash2, Shield,
   ChevronsDownUp, ChevronsUpDown, Save, X, PenLine,
 } from 'lucide-react'
+import { CirclePlusFilled } from '@/components/icons/CirclePlusFilled'
 import type { Role, RoleStatus, PermissionGroup } from '@/types'
 import type { CreateRoleRequest, UpdateRoleRequest } from '@/services/api/permission.api'
 import { PageActions } from '@/components/layouts/PageActions'
@@ -391,7 +392,7 @@ export default function PermissionManagePage() {
             onClick={() => { setEditingRole(null); setShowRoleModal(true) }}
             disabled={isEditing}
           >
-            <Plus className="w-4 h-4" />
+            <CirclePlusFilled />
             新增角色
           </Button>
         </PageActions>
@@ -848,7 +849,7 @@ function RoleModal({ isOpen, onClose, role, onSubmit, isLoading }: RoleModalProp
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-1">角色名称</label>
+            <label className="mb-3 block text-sm leading-none font-medium text-foreground">角色名称</label>
             <Input
               type="text"
               value={formData.name}
@@ -858,7 +859,7 @@ function RoleModal({ isOpen, onClose, role, onSubmit, isLoading }: RoleModalProp
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">角色代码</label>
+            <label className="mb-3 block text-sm leading-none font-medium text-foreground">角色代码</label>
             <Input
               type="text"
               value={formData.code}
@@ -870,7 +871,7 @@ function RoleModal({ isOpen, onClose, role, onSubmit, isLoading }: RoleModalProp
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">状态</label>
+          <label className="mb-3 block text-sm leading-none font-medium text-foreground">状态</label>
           <Select
             value={formData.status}
             onValueChange={(v) => setFormData((d) => ({ ...d, status: v as RoleStatus }))}
@@ -881,7 +882,7 @@ function RoleModal({ isOpen, onClose, role, onSubmit, isLoading }: RoleModalProp
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">描述</label>
+          <label className="mb-3 block text-sm leading-none font-medium text-foreground">描述</label>
           <Textarea
             value={formData.description}
             onChange={(e) => setFormData((d) => ({ ...d, description: e.target.value }))}

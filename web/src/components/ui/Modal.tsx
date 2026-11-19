@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react'
-import { X, AlertTriangle, Info, CheckCircle, AlertCircle } from 'lucide-react'
+import React from 'react'
+import { AlertTriangle, Info, CheckCircle, AlertCircle } from 'lucide-react'
 import { cn } from '@/utils'
 import { Button } from './button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from './dialog'
 
 export interface ModalProps {
   isOpen: boolean
@@ -14,6 +15,18 @@ export interface ModalProps {
   className?: string
 }
 
+const SIZE_CLASSES = {
+  sm: 'sm:max-w-sm',
+  md: 'sm:max-w-md',
+  lg: 'sm:max-w-lg',
+  xl: 'sm:max-w-xl',
+}
+
+/**
+ * 通用弹窗：底层是 shadcn Dialog（焦点锁定、Esc 关闭、滚动锁定都由 Radix 处理）。
+ * 样式同官方：圆角 10、无分隔线，标题 18/600 在左上，内容自己决定内边距。
+ * 没有标题时也渲染一个隐藏的 DialogTitle，读屏能念出来。
+ */
 export const Modal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
@@ -22,89 +35,23 @@ export const Modal: React.FC<ModalProps> = ({
   size = 'md',
   closeOnOverlay = true,
   showCloseButton = true,
-  className
-}) => {
-  const overlayRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = 'unset'
-    }
-
-    return () => {
-      document.body.style.overflow = 'unset'
-    }
-  }, [isOpen])
-
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose()
-      }
-    }
-
-    document.addEventListener('keydown', handleEscape)
-    return () => document.removeEventListener('keydown', handleEscape)
-  }, [isOpen, onClose])
-
-  if (!isOpen) return null
-
-  const sizeClasses = {
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg',
-    xl: 'max-w-xl'
-  }
-
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    if (closeOnOverlay && e.target === overlayRef.current) {
-      onClose()
-    }
-  }
-
-  return (
-    <div
-      ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-xs"
-      onClick={handleOverlayClick}
+  className,
+}) => (
+  <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+    <DialogContent
+      showCloseButton={showCloseButton}
+      aria-describedby={undefined}
+      onInteractOutside={(e) => !closeOnOverlay && e.preventDefault()}
+      onEscapeKeyDown={(e) => !closeOnOverlay && e.preventDefault()}
+      className={cn('flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0', SIZE_CLASSES[size], className)}
     >
-      <div
-        className={cn(
-          'relative w-full max-h-[90vh] mx-4 bg-bg-elevated rounded-lg shadow-xl',
-          'animate-in fade-in-0 zoom-in-95 duration-200',
-          sizeClasses[size],
-          className
-        )}
-      >
-        {/* Header */}
-        {(title || showCloseButton) && (
-          <div className="flex items-center justify-between p-4 border-b border-border">
-            {title && (
-              <h2 className="text-lg font-semibold text-text-primary">
-                {title}
-              </h2>
-            )}
-            {showCloseButton && (
-              <button
-                onClick={onClose}
-                className="p-1 rounded-lg text-text-tertiary hover:text-text-secondary hover:bg-bg-container transition-colors"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* Content */}
-        <div className="overflow-y-auto max-h-[calc(90vh-8rem)]">
-          {children}
-        </div>
-      </div>
-    </div>
-  )
-}
+      <DialogHeader className={cn('px-6 pt-6', !title && 'sr-only')}>
+        <DialogTitle>{title || '对话框'}</DialogTitle>
+      </DialogHeader>
+      <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+    </DialogContent>
+  </Dialog>
+)
 
 export interface AlertModalProps {
   isOpen: boolean

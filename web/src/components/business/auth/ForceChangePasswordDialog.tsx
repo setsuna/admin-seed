@@ -142,7 +142,7 @@ export const ForceChangePasswordDialog: React.FC<ForceChangePasswordDialogProps>
       closeOnOverlay={false}
       showCloseButton={!loading}
     >
-      <form onSubmit={handleSubmit} className="p-6 space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-4 px-6 pt-4 pb-6">
         {/* 提示信息 */}
         <div className="flex items-start gap-3 p-3 bg-warning/10 border border-warning/30 rounded-lg">
           <KeyRound className="h-5 w-5 text-warning shrink-0 mt-0.5" />
@@ -163,7 +163,7 @@ export const ForceChangePasswordDialog: React.FC<ForceChangePasswordDialogProps>
 
         {/* 原密码 */}
         <div>
-          <label className="block text-sm font-medium text-text-secondary mb-2">
+          <label className="mb-3 block text-sm leading-none font-medium text-foreground">
             原密码
           </label>
           <div className="relative">
@@ -190,7 +190,7 @@ export const ForceChangePasswordDialog: React.FC<ForceChangePasswordDialogProps>
 
         {/* 新密码 */}
         <div>
-          <label className="block text-sm font-medium text-text-secondary mb-2">
+          <label className="mb-3 block text-sm leading-none font-medium text-foreground">
             新密码
           </label>
           <div className="relative">
@@ -217,7 +217,7 @@ export const ForceChangePasswordDialog: React.FC<ForceChangePasswordDialogProps>
 
         {/* 确认密码 */}
         <div>
-          <label className="block text-sm font-medium text-text-secondary mb-2">
+          <label className="mb-3 block text-sm leading-none font-medium text-foreground">
             确认新密码
           </label>
           <div className="relative">

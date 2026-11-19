@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
-import { X, Plus, Trash2, Save } from 'lucide-react'
+import { Plus, Trash2, Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Modal } from '@/components/ui/Modal'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/option-select'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -121,21 +122,15 @@ const DictEditModal: React.FC<DictEditModalProps> = ({
     }
   }
 
-  if (!isOpen) return null
-
   return (
-    <div className="fixed inset-0 bg-foreground/50 flex items-center justify-center z-50">
-      <div className="bg-card rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-lg font-semibold">
-            {dict ? '编辑数据字典' : '新建数据字典'}
-          </h2>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
-
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={dict ? '编辑数据字典' : '新建数据字典'}
+      closeOnOverlay={!loading}
+      className="sm:max-w-4xl"
+    >
+        <div className="px-6 py-4">
           {/* 基础信息 */}
           <Card className="mb-6">
             <CardHeader>
@@ -144,7 +139,7 @@ const DictEditModal: React.FC<DictEditModalProps> = ({
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">字典编码 *</label>
+                  <label className="mb-3 block text-sm leading-none font-medium text-foreground">字典编码 *</label>
                   <Input
                     value={formData.dictCode}
                     onChange={(e) => setFormData(prev => ({ ...prev, dictCode: e.target.value }))}
@@ -153,7 +148,7 @@ const DictEditModal: React.FC<DictEditModalProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">字典名称 *</label>
+                  <label className="mb-3 block text-sm leading-none font-medium text-foreground">字典名称 *</label>
                   <Input
                     value={formData.dictName}
                     onChange={(e) => setFormData(prev => ({ ...prev, dictName: e.target.value }))}
@@ -161,7 +156,7 @@ const DictEditModal: React.FC<DictEditModalProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">字典类型 *</label>
+                  <label className="mb-3 block text-sm leading-none font-medium text-foreground">字典类型 *</label>
                   <Input
                     value={formData.dictType}
                     onChange={(e) => setFormData(prev => ({ ...prev, dictType: e.target.value }))}
@@ -169,7 +164,7 @@ const DictEditModal: React.FC<DictEditModalProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">状态</label>
+                  <label className="mb-3 block text-sm leading-none font-medium text-foreground">状态</label>
                   <Select
                     value={formData.status}
                     onValueChange={(v) => setFormData(prev => ({ ...prev, status: v as EntityStatus }))}
@@ -182,7 +177,7 @@ const DictEditModal: React.FC<DictEditModalProps> = ({
                 </div>
               </div>
               <div className="mt-4">
-                <label className="block text-sm font-medium mb-2">备注</label>
+                <label className="mb-3 block text-sm leading-none font-medium text-foreground">备注</label>
                 <textarea
                   value={formData.remark}
                   onChange={(e) => setFormData(prev => ({ ...prev, remark: e.target.value }))}
@@ -228,7 +223,7 @@ const DictEditModal: React.FC<DictEditModalProps> = ({
                       
                       <div className="grid grid-cols-3 gap-4">
                         <div>
-                          <label className="block text-sm font-medium mb-2">项编码 *</label>
+                          <label className="mb-3 block text-sm leading-none font-medium text-foreground">项编码 *</label>
                           <Input
                             value={item.code}
                             onChange={(e) => handleItemChange(index, 'code', e.target.value)}
@@ -236,7 +231,7 @@ const DictEditModal: React.FC<DictEditModalProps> = ({
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium mb-2">项名称 *</label>
+                          <label className="mb-3 block text-sm leading-none font-medium text-foreground">项名称 *</label>
                           <Input
                             value={item.name}
                             onChange={(e) => handleItemChange(index, 'name', e.target.value)}
@@ -244,7 +239,7 @@ const DictEditModal: React.FC<DictEditModalProps> = ({
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium mb-2">项值 *</label>
+                          <label className="mb-3 block text-sm leading-none font-medium text-foreground">项值 *</label>
                           <Input
                             value={item.value}
                             onChange={(e) => handleItemChange(index, 'value', e.target.value)}
@@ -252,7 +247,7 @@ const DictEditModal: React.FC<DictEditModalProps> = ({
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium mb-2">状态</label>
+                          <label className="mb-3 block text-sm leading-none font-medium text-foreground">状态</label>
                           <Select
                             value={item.status}
                             onValueChange={(v) => handleItemChange(index, 'status', v)}
@@ -264,7 +259,7 @@ const DictEditModal: React.FC<DictEditModalProps> = ({
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium mb-2">排序</label>
+                          <label className="mb-3 block text-sm leading-none font-medium text-foreground">排序</label>
                           <Input
                             type="number"
                             value={item.sort}
@@ -273,7 +268,7 @@ const DictEditModal: React.FC<DictEditModalProps> = ({
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium mb-2">备注</label>
+                          <label className="mb-3 block text-sm leading-none font-medium text-foreground">备注</label>
                           <Input
                             value={item.remark || ''}
                             onChange={(e) => handleItemChange(index, 'remark', e.target.value)}
@@ -289,7 +284,7 @@ const DictEditModal: React.FC<DictEditModalProps> = ({
           </Card>
         </div>
 
-        <div className="flex items-center justify-end gap-2 p-6 border-t bg-muted">
+        <div className="sticky bottom-0 flex flex-col-reverse gap-2 bg-background px-6 pb-6 pt-2 sm:flex-row sm:justify-end">
           <Button variant="outline" onClick={onClose}>
             取消
           </Button>
@@ -298,8 +293,7 @@ const DictEditModal: React.FC<DictEditModalProps> = ({
             {loading ? '保存中...' : '保存'}
           </Button>
         </div>
-      </div>
-    </div>
+    </Modal>
   )
 }
 

@@ -2,14 +2,12 @@ import { Outlet } from 'react-router-dom'
 import { AppSidebar } from './AppSidebar'
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
 import { Separator } from '@/components/ui/separator'
-import { Button } from '@/components/ui/button'
 import { ThemeSwitcher } from '@/components/ThemeSwitcher'
 import { SoundToggle } from './SoundToggle'
 import { SoundEffectManager } from './SoundEffectManager'
 import { PermissionInitializer } from './PermissionInitializer'
 import { WebSocketInitializer } from './WebSocketInitializer'
 import { IdleTimeoutManager } from './IdleTimeoutManager'
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover'
 import { ChangePasswordDialog } from '@/components/business/auth/ChangePasswordDialog'
 import { useStore } from '@/store'
 import { authService } from '@/services/core/auth.service'
@@ -17,7 +15,7 @@ import { useLocation } from 'react-router-dom'
 import { getBreadcrumbFromMenu } from '@/utils/breadcrumb'
 import { useMemo, useCallback, memo, useState } from 'react'
 import { shallow } from 'zustand/shallow'
-import { KeyRound, ChevronDown } from 'lucide-react'
+import { NavUser } from './NavUser'
 
 // ✅ 将选择器提取到组件外部，避免每次渲染创建新函数
 const selectMainLayoutState = (state: any) => ({
@@ -34,8 +32,6 @@ export const MainLayout = memo(function MainLayout() {
   
   // 🆕 修改密码对话框状态
   const [changePasswordOpen, setChangePasswordOpen] = useState(false)
-  // 🆕 用户菜单 Popover 状态
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
   
   const handleLogout = useCallback(async () => {
     try {
@@ -50,7 +46,6 @@ export const MainLayout = memo(function MainLayout() {
   
   // 🆕 打开修改密码对话框
   const handleChangePassword = useCallback(() => {
-    setUserMenuOpen(false)
     setChangePasswordOpen(true)
   }, [])
   
@@ -73,91 +68,43 @@ export const MainLayout = memo(function MainLayout() {
       {/* 空闲超时管理器 - 负责监听用户活动并在超时后登出 */}
       <IdleTimeoutManager />
       
-      <AppSidebar />
-      <SidebarInset>
-        <header className="sticky top-0 z-10 flex h-header shrink-0 items-center gap-3 border-b bg-background px-4 sm:gap-4">
-          <SidebarTrigger variant="outline" className="scale-125 sm:scale-100" />
-          <Separator orientation="vertical" className="h-6" />
-          
-          {/* 面包屑导航 */}
-          <div className="flex flex-1 items-center justify-between">
-            <nav className="flex items-center space-x-1 text-sm text-muted-foreground">
-              <span>{breadcrumb.module}</span>
-              <span>/</span>
-              {breadcrumb.parent && (
-                <>
-                  <span>{breadcrumb.parent}</span>
-                  <span>/</span>
-                </>
-              )}
-              {/* 页面标题的语义 landmark。视觉上就是面包屑最后一段，
-                  各页不再重复渲染大标题（详见 PageActions 组件注释）。 */}
-              <h1 className="text-sm font-normal text-foreground">{breadcrumb.page}</h1>
+      {/* 结构照 shadcn 官方 dashboard（ui.shadcn.com/examples/dashboard）：
+          左侧栏通顶（顶部系统名、底部当前用户）；右侧 = 顶栏（48 + 1px 底线）+ 内容区 */}
+      <AppSidebar
+        footer={user && <NavUser user={user} onChangePassword={handleChangePassword} onLogout={handleLogout} />}
+      />
+      <SidebarInset className="min-w-0">
+        {/* 顶栏：折叠按钮 | 面包屑（最后一段即页面标题）… 页面操作 + 音效 + 主题。
+            手机上页面操作按钮换到第二行，桌面一行。 */}
+        <header className="sticky top-0 z-10 flex min-h-header shrink-0 items-center border-b bg-background md:h-header">
+          <div className="flex w-full min-w-0 flex-wrap items-center gap-1 px-4 py-2 md:flex-nowrap md:py-0 lg:gap-2 lg:px-6">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
+
+            {/* 面包屑：手机上只显示当前页 */}
+            <nav aria-label="面包屑" className="min-w-0 flex-1 text-sm text-muted-foreground">
+              <ol className="flex items-center gap-1.5 whitespace-nowrap">
+                {[breadcrumb.module, breadcrumb.parent].filter(Boolean).map((item) => (
+                  <li key={item} className="hidden items-center gap-1.5 md:flex">
+                    <span className="truncate">{item}</span>
+                    <span aria-hidden>/</span>
+                  </li>
+                ))}
+                {/* 页面标题的语义 landmark。视觉上就是面包屑最后一段，
+                    各页不再重复渲染大标题（详见 PageActions 组件注释）。 */}
+                <li aria-current="page" className="min-w-0">
+                  <h1 className="truncate text-base font-medium text-foreground">{breadcrumb.page}</h1>
+                </li>
+              </ol>
             </nav>
 
-            {/* 右侧操作区 */}
-            <div className="flex items-center gap-2">
-              {/* 页面级操作按钮的挂载点，由 <PageActions> 通过 Portal 填充 */}
-              <div id="page-actions" className="flex items-center gap-2" />
-              {(
-                <span className="mx-1 hidden h-5 w-px bg-border sm:block" aria-hidden />
-              )}
-              {/* 音效开关 - 使用独立组件，避免父组件重渲染 */}
-              <SoundToggle />
-              
-              {/* 主题切换 */}
-              <ThemeSwitcher />
-              
-              {/* 用户菜单 */}
-              {user && (
-                <div className="flex items-center gap-3 pl-2">
-                  {/* 🆕 用户头像下拉菜单 */}
-                  <Popover open={userMenuOpen} onOpenChange={setUserMenuOpen}>
-                    <PopoverTrigger asChild>
-                      <button className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-accent transition-colors">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm">
-                          {(user.name || user.username).charAt(0).toUpperCase()}
-                        </div>
-                        <div className="hidden md:block text-left">
-                          <div className="text-sm font-medium">{user.name || user.username}</div>
-                          <div className="text-xs text-muted-foreground">{user.role}</div>
-                        </div>
-                        <ChevronDown className="h-4 w-4 text-muted-foreground hidden md:block" />
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent align="end" className="w-48 p-1">
-                      <button
-                        onClick={handleChangePassword}
-                        className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-sm hover:bg-accent transition-colors"
-                      >
-                        <KeyRound className="h-4 w-4" />
-                        <span>修改密码</span>
-                      </button>
-                    </PopoverContent>
-                  </Popover>
-                  
-                  {/* 退出按钮 */}
-                  <Button variant="ghost" size="icon" onClick={handleLogout}>
-                    <span className="sr-only">退出登录</span>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                      <polyline points="16 17 21 12 16 7" />
-                      <line x1="21" x2="9" y1="12" y2="12" />
-                    </svg>
-                  </Button>
-                </div>
-              )}
-            </div>
+            {/* 页面级操作按钮的挂载点，由 <PageActions> 通过 Portal 填充 */}
+            <div
+              id="page-actions"
+              className="order-last flex basis-full items-center gap-2 empty:hidden md:order-none md:basis-auto md:overflow-x-auto"
+            />
+            <SoundToggle />
+            <ThemeSwitcher />
           </div>
         </header>
         

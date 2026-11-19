@@ -6,16 +6,16 @@ import {
   Download, 
   Trash2, 
   RefreshCw, 
-  Eye, 
   Edit, 
-  Power,
-  PowerOff,
   X
 } from 'lucide-react'
+import { CirclePlusFilled } from '@/components/icons/CirclePlusFilled'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/option-select'
 import { DataTable } from '@/components/features/DataTable'
+import { RowActions } from '@/components/features/RowActions'
+import { StatusTag } from '@/components/ui/StatusTag'
 import { PageActions } from '@/components/layouts/PageActions'
 import { Card, CardContent } from '@/components/ui/card'
 import DictEditModal from '@/components/features/DictEditModal'
@@ -34,8 +34,8 @@ import type {
 } from '@/types'
 
 const statusConfig = {
-  enabled: { label: '启用', color: 'text-green-600', bgColor: 'bg-green-100', icon: Power },
-  disabled: { label: '禁用', color: 'text-red-600', bgColor: 'bg-red-100', icon: PowerOff }
+  enabled: { label: '启用', tone: 'success' as const },
+  disabled: { label: '禁用', tone: 'neutral' as const },
 }
 
 const DataDictionaryPage: React.FC = () => {
@@ -220,13 +220,7 @@ const DataDictionaryPage: React.FC = () => {
     if (!config) {
       return <span>{status}</span>
     }
-    const Icon = config.icon
-    return (
-      <span className={`inline-flex items-center px-2 py-1 text-xs font-medium rounded-full ${config.bgColor} ${config.color}`}>
-        <Icon className="w-3 h-3 mr-1" />
-        {config.label}
-      </span>
-    )
+    return <StatusTag tone={config.tone}>{config.label}</StatusTag>
   }
 
   const renderDictItems = (items: DictItem[] = []) => {
@@ -326,46 +320,18 @@ const DataDictionaryPage: React.FC = () => {
     },
     {
       key: 'actions',
-      title: '操作',
-      width: 200,
-      align: 'center',
+      title: '',
+      width: 56,
+      align: 'right',
       render: (_, record: DataDict) => (
-        <div className="flex items-center justify-center gap-1">
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => handleToggleExpand(record.id)}
-            title="查看详情"
-          >
-            <Eye className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => handleEdit(record)}
-            disabled={loadingDetails}
-            title="编辑"
-          >
-            <Edit className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => handleDelete(record.id)}
-            className="text-red-600 hover:text-red-700"
-            title="删除"
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
-          <Button 
-            variant="ghost" 
-            size="sm"
-            onClick={() => handleExport()}
-            title="下载"
-          >
-            <Download className="w-4 h-4" />
-          </Button>
-        </div>
+        <RowActions
+          actions={[
+            { key: 'view', label: expandedDict === record.id ? '收起详情' : '查看详情', onClick: () => handleToggleExpand(record.id) },
+            { key: 'edit', label: '编辑', onClick: () => handleEdit(record), disabled: loadingDetails },
+            { key: 'export', label: '下载', onClick: () => handleExport() },
+          ]}
+          more={[{ key: 'delete', label: '删除', danger: true, onClick: () => handleDelete(record.id) }]}
+        />
       ),
     },
   ]
@@ -416,14 +382,14 @@ const DataDictionaryPage: React.FC = () => {
       {/* 页面级操作：送到顶栏 */}
       <PageActions>
         <Button size="sm" className="h-control" onClick={handleCreateNew} disabled={isCreating}>
-          <Plus />
+          <CirclePlusFilled />
           新增字典
         </Button>
       </PageActions>
 
-      {/* 表格卡：工具栏 + 表格 + 展开详情，同一层边框（不要再给 DataTable 传 bordered） */}
-      <div className="overflow-hidden rounded-xl border bg-card shadow-xs">
-        <div className="flex items-center justify-between gap-2 border-b px-cell py-2">
+      {/* 照官方：工具栏（无边框）→ 表格（自带圆角边框，分页在框外）→ 展开的详情卡 */}
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between gap-2">
           <span className="text-table text-muted-foreground">
             {selectedIds.length > 0 ? `已选 ${selectedIds.length} 项` : '勾选后可批量删除、同步到设备'}
           </span>
@@ -456,6 +422,7 @@ const DataDictionaryPage: React.FC = () => {
         </div>
 
         <DataTable
+          bordered
           data={dictionaries}
           columns={columns}
           loading={isLoading}
@@ -468,7 +435,7 @@ const DataDictionaryPage: React.FC = () => {
         
         {/* 展开的字典详情 */}
         {expandedDict && (
-          <div className="border-t">
+          <div className="overflow-hidden rounded-[10px] border">
             {loadingDetails ? (
               <div className="p-8 text-center text-muted-foreground">
                 加载详情中...

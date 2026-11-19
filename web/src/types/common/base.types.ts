@@ -12,9 +12,9 @@ export type EntityStatus = 'enabled' | 'disabled'
 export type ActiveStatus = 'active' | 'inactive' | 'suspended'
 export type OperationStatus = 'pending' | 'processing' | 'completed' | 'failed'
 
-// 主题系统（三个正交维度）
+// 主题系统（两个正交维度）
 //
-//   明暗模式 ThemeMode  ×  品牌色 BrandTheme  ×  界面密度 UIDensity
+//   明暗模式 ThemeMode  ×  品牌色 BrandTheme
 //
 // 中性色 / 语义色全局固定（shadcn neutral），换肤只换品牌色的 brand / brand-dark / tint，
 // 因此任意品牌色 × 2 种明暗都能保持协调。
@@ -34,13 +34,6 @@ export type BrandTheme =
   | 'tech-teal'     // 科技青
   | 'tech-blue'     // 科技蓝
   | 'indigo'        // 靛蓝
-
-/**
- * 界面密度（第三个正交维度，与明暗、品牌色互不影响）
- *   comfortable  舒展卡片风
- *   compact      紧凑数据风
- */
-export type UIDensity = 'comfortable' | 'compact'
 
 /**
  * @deprecated 旧的单维度主题类型。已拆分为 ThemeMode + BrandTheme。
