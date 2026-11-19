@@ -1,23 +1,14 @@
 import React, { useState } from 'react'
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  Download, 
-  Trash2, 
-  RefreshCw, 
-  Edit, 
-  X
-} from 'lucide-react'
+import { Search, Filter, Download, Trash2, RefreshCw } from 'lucide-react'
 import { CirclePlusFilled } from '@/components/icons/CirclePlusFilled'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/option-select'
 import { DataTable } from '@/components/features/DataTable'
 import { RowActions } from '@/components/features/RowActions'
+import { DictDetailSheet } from '@/components/features/DictDetailSheet'
 import { StatusTag } from '@/components/ui/StatusTag'
 import { PageActions } from '@/components/layouts/PageActions'
-import { Card, CardContent } from '@/components/ui/card'
 import DictEditModal from '@/components/features/DictEditModal'
 import { useGlobalDialog } from '@/components/ui/DialogProvider'
 import { useDict } from '@/hooks/useDict'
@@ -26,7 +17,6 @@ import { dictApi } from '@/services/dict'
 import { debounce } from '@/utils'
 import type { 
   DataDict, 
-  DictItem, 
   EntityStatus,
   TableColumn,
   CreateDictRequest,
@@ -68,8 +58,9 @@ const DataDictionaryPage: React.FC = () => {
   // 表单状态
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [editingDict, setEditingDict] = useState<DataDict | null>(null)
-  const [expandedDict, setExpandedDict] = useState<string | null>(null)
-  const [expandedDictDetails, setExpandedDictDetails] = useState<DataDict | null>(null)
+  // 详情抽屉：正在查看的字典 id 和加载到的完整详情（含字典项）
+  const [viewingDictId, setViewingDictId] = useState<string | null>(null)
+  const [viewingDict, setViewingDict] = useState<DataDict | null>(null)
   const [loadingDetails, setLoadingDetails] = useState(false)
   
   // 搜索关键词状态
@@ -100,23 +91,25 @@ const DataDictionaryPage: React.FC = () => {
     setPagination({ page: 1, pageSize: pagination?.pageSize || 10 })
   }
 
-  const handleToggleExpand = async (dictId: string) => {
-    if (expandedDict === dictId) {
-      setExpandedDict(null)
-      setExpandedDictDetails(null)
-    } else {
-      setExpandedDict(dictId)
-      // 加载完整的字典详情（包括items）
-      setLoadingDetails(true)
-      try {
-        const details = await dictApi.getDictionary(dictId)
-        setExpandedDictDetails(details)
-      } catch (error) {
-        console.error('Failed to load dictionary details:', error)
-      } finally {
-        setLoadingDetails(false)
-      }
+  // 打开详情抽屉，加载完整的字典详情（包括 items）
+  const handleView = async (dictId: string) => {
+    setViewingDictId(dictId)
+    setViewingDict(null)
+    setLoadingDetails(true)
+    try {
+      setViewingDict(await dictApi.getDictionary(dictId))
+    } catch (error: any) {
+      console.error('Failed to load dictionary details:', error)
+      showError('加载失败', error?.message || '无法加载字典详情，请重试')
+      setViewingDictId(null)
+    } finally {
+      setLoadingDetails(false)
     }
+  }
+
+  const closeView = () => {
+    setViewingDictId(null)
+    setViewingDict(null)
   }
 
   const handleEdit = async (dict: DataDict) => {
@@ -223,61 +216,6 @@ const DataDictionaryPage: React.FC = () => {
     return <StatusTag tone={config.tone}>{config.label}</StatusTag>
   }
 
-  const renderDictItems = (items: DictItem[] = []) => {
-    if (!items || items.length === 0) {
-      return (
-        <div className="mt-4 border-t pt-4 text-center text-muted-foreground">
-          暂无字典项
-        </div>
-      )
-    }
-
-    return (
-      <div className="mt-4 border-t pt-4">
-        <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
-          字典项列表
-          <Button variant="outline" size="sm">
-            <Plus className="w-3 h-3" />
-            新增项
-          </Button>
-        </h4>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b bg-muted/20">
-                <th className="text-left p-2 font-medium">项编码</th>
-                <th className="text-left p-2 font-medium">项名称</th>
-                <th className="text-left p-2 font-medium">项值</th>
-                <th className="text-left p-2 font-medium">状态</th>
-                <th className="text-center p-2 font-medium">操作</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map(item => (
-                <tr key={item.id} className="border-b hover:bg-muted/10">
-                  <td className="p-2 font-mono text-xs">{item.code}</td>
-                  <td className="p-2">{item.name}</td>
-                  <td className="p-2 font-mono text-xs">{item.value}</td>
-                  <td className="p-2">{renderStatus(item.status)}</td>
-                  <td className="p-2 text-center">
-                    <div className="flex items-center justify-center gap-1">
-                      <Button variant="ghost" size="sm">
-                        <Edit className="w-3 h-3" />
-                      </Button>
-                      <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
-                        <Trash2 className="w-3 h-3" />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    )
-  }
-
   const columns: TableColumn<DataDict>[] = [
     {
       key: 'dictCode',
@@ -291,8 +229,14 @@ const DataDictionaryPage: React.FC = () => {
       key: 'dictName',
       title: '字典名称',
       width: 150,
-      render: (dictName: string) => (
-        <span className="font-medium">{dictName}</span>
+      render: (dictName: string, record: DataDict) => (
+        <button
+          type="button"
+          className="font-medium text-foreground hover:underline underline-offset-4"
+          onClick={() => handleView(record.id)}
+        >
+          {dictName}
+        </button>
       ),
     },
     {
@@ -326,7 +270,7 @@ const DataDictionaryPage: React.FC = () => {
       render: (_, record: DataDict) => (
         <RowActions
           actions={[
-            { key: 'view', label: expandedDict === record.id ? '收起详情' : '查看详情', onClick: () => handleToggleExpand(record.id) },
+            { key: 'view', label: '查看详情', onClick: () => handleView(record.id) },
             { key: 'edit', label: '编辑', onClick: () => handleEdit(record), disabled: loadingDetails },
             { key: 'export', label: '下载', onClick: () => handleExport() },
           ]}
@@ -387,7 +331,7 @@ const DataDictionaryPage: React.FC = () => {
         </Button>
       </PageActions>
 
-      {/* 照官方：工具栏（无边框）→ 表格（自带圆角边框，分页在框外）→ 展开的详情卡 */}
+      {/* 照官方：工具栏（无边框）→ 表格（自带圆角边框，分页在框外）；详情和编辑都在右侧抽屉 */}
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between gap-2">
           <span className="text-table text-muted-foreground">
@@ -432,72 +376,22 @@ const DataDictionaryPage: React.FC = () => {
           selectedRowKeys={selectedIds}
           onSelectionChange={setSelectedIds}
         />
-        
-        {/* 展开的字典详情 */}
-        {expandedDict && (
-          <div className="overflow-hidden rounded-[10px] border">
-            {loadingDetails ? (
-              <div className="p-8 text-center text-muted-foreground">
-                加载详情中...
-              </div>
-            ) : expandedDictDetails ? (
-              <Card className="m-4 gap-0 border-0 py-0 shadow-none">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold flex items-center gap-2">
-                      <span>字典详情: {expandedDictDetails.dictCode} - {expandedDictDetails.dictName}</span>
-                    </h3>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => {
-                        setExpandedDict(null)
-                        setExpandedDictDetails(null)
-                      }}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  
-                  <div className="grid grid-cols-4 gap-4 mb-4 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">字典类型：</span>
-                      <span className="font-medium">{expandedDictDetails.dictType}</span>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">状态：</span>
-                      {renderStatus(expandedDictDetails.status)}
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">子项数量：</span>
-                      <span className="font-medium">{expandedDictDetails.itemCount}</span>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">更新时间：</span>
-                      <span className="font-medium">{new Date(expandedDictDetails.updatedAt).toLocaleString('zh-CN')}</span>
-                    </div>
-                  </div>
-                  
-                  {expandedDictDetails.remark && (
-                    <div className="mb-4 text-sm">
-                      <span className="text-muted-foreground">备注：</span>
-                      <span>{expandedDictDetails.remark}</span>
-                    </div>
-                  )}
-                  
-                  {renderDictItems(expandedDictDetails.items || [])}
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="p-8 text-center text-muted-foreground">
-                无法加载字典详情
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
-      {/* 编辑弹窗 */}
+      {/* 详情抽屉（只读）；「编辑」切到编辑抽屉 */}
+      <DictDetailSheet
+        open={!!viewingDictId}
+        dict={viewingDict}
+        loading={loadingDetails}
+        onClose={closeView}
+        onEdit={(dict) => {
+          closeView()
+          setEditingDict(dict)
+          setIsEditModalOpen(true)
+        }}
+      />
+
+      {/* 编辑抽屉 */}
       <DictEditModal
         isOpen={isEditModalOpen}
         onClose={() => {
