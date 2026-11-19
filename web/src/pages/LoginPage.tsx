@@ -308,7 +308,7 @@ const LoginPage = () => {
       <div className="mt-6 text-center text-sm text-muted-foreground">
         <p className="mb-2">测试账号：</p>
         <div className="space-y-1">
-          <p>系统管理员：admin / admin123</p>
+          <p>系统管理员：admin / 1234QWer</p>
         </div>
       </div>
     )

@@ -839,7 +839,7 @@ function RoleModal({ isOpen, onClose, role, onSubmit, isLoading }: RoleModalProp
       isOpen={isOpen}
       onClose={onClose}
       title={role ? '编辑角色' : '新增角色'}
-      size="lg"
+      variant="sheet"
       onSubmit={handleSubmit}
       submitText={isLoading ? '保存中...' : '保存'}
       cancelText="取消"
@@ -875,6 +875,7 @@ function RoleModal({ isOpen, onClose, role, onSubmit, isLoading }: RoleModalProp
           <Select
             value={formData.status}
             onValueChange={(v) => setFormData((d) => ({ ...d, status: v as RoleStatus }))}
+            className="w-full"
             options={[
               { value: 'active', label: '启用' },
               { value: 'inactive', label: '停用' },

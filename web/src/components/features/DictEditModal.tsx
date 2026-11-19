@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { Plus, Trash2, Save } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Modal } from '@/components/ui/Modal'
+import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from '@/components/ui/sheet'
+import { Textarea } from '@/components/ui/textarea'
+import { useIsMobile } from '@/hooks/use-mobile'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/option-select'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useNotifications } from '@/hooks/useNotifications'
+import { cn } from '@/utils'
 import type { DataDict, DictItem, CreateDictRequest, EntityStatus } from '@/types'
 
 interface DictEditModalProps {
@@ -23,6 +25,7 @@ const DictEditModal: React.FC<DictEditModalProps> = ({
 }) => {
   const { showError } = useNotifications()
   const [loading, setLoading] = useState(false)
+  const isMobile = useIsMobile()
   const [formData, setFormData] = useState({
     dictCode: '',
     dictName: '',
@@ -122,21 +125,22 @@ const DictEditModal: React.FC<DictEditModalProps> = ({
     }
   }
 
+  // 列表记录的新建 / 编辑走右侧抽屉（宽 640：下面还要编辑字典项），手机上从底部出
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={dict ? '编辑数据字典' : '新建数据字典'}
-      closeOnOverlay={!loading}
-      className="sm:max-w-4xl"
-    >
-        <div className="px-6 py-4">
+    <Sheet open={isOpen} onOpenChange={(open) => !open && !loading && onClose()}>
+      <SheetContent
+        side={isMobile ? 'bottom' : 'right'}
+        className={cn('gap-0 sm:max-w-[640px]', isMobile && 'max-h-[90svh]')}
+      >
+        <SheetHeader className="gap-1">
+          <SheetTitle>{dict ? '编辑数据字典' : '新建数据字典'}</SheetTitle>
+          <SheetDescription className="sr-only">数据字典的基础信息和字典项</SheetDescription>
+        </SheetHeader>
+        <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4 text-sm">
           {/* 基础信息 */}
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle>基础信息</CardTitle>
-            </CardHeader>
-            <CardContent>
+          <section className="flex flex-col gap-4">
+            <h3 className="font-medium">基础信息</h3>
+            <div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="mb-3 block text-sm leading-none font-medium text-foreground">字典编码 *</label>
@@ -178,29 +182,29 @@ const DictEditModal: React.FC<DictEditModalProps> = ({
               </div>
               <div className="mt-4">
                 <label className="mb-3 block text-sm leading-none font-medium text-foreground">备注</label>
-                <textarea
+                <Textarea
                   value={formData.remark}
                   onChange={(e) => setFormData(prev => ({ ...prev, remark: e.target.value }))}
                   placeholder="请输入备注信息"
-                  className="w-full rounded-md border bg-background px-3 py-2 text-sm"
                   rows={3}
+                  className="resize-none"
                 />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </section>
 
           {/* 字典项 */}
-          <Card>
-            <CardHeader>
+          <section className="mt-6 flex flex-col gap-4 border-t pt-6">
+            <div>
               <div className="flex items-center justify-between">
-                <CardTitle>字典项</CardTitle>
+                <h3 className="font-medium">字典项</h3>
                 <Button variant="outline" size="sm" onClick={handleAddItem}>
                   <Plus className="w-4 h-4" />
                   添加项
                 </Button>
               </div>
-            </CardHeader>
-            <CardContent>
+            </div>
+            <div>
               {items.length === 0 ? (
                 <div className="text-center py-8 text-muted-foreground">
                   暂无字典项，点击添加项按钮开始添加
@@ -280,20 +284,21 @@ const DictEditModal: React.FC<DictEditModalProps> = ({
                   ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </section>
         </div>
 
-        <div className="sticky bottom-0 flex flex-col-reverse gap-2 bg-background px-6 pb-6 pt-2 sm:flex-row sm:justify-end">
-          <Button variant="outline" onClick={onClose}>
-            取消
-          </Button>
+        <SheetFooter>
           <Button onClick={handleSave} disabled={loading}>
             <Save className="w-4 h-4" />
             {loading ? '保存中...' : '保存'}
           </Button>
-        </div>
-    </Modal>
+          <Button variant="outline" onClick={onClose} disabled={loading}>
+            取消
+          </Button>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   )
 }
 
